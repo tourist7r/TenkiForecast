@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Tenki Forecast</string>
+    <string name="tab_text_1">Muscat</string>
+    <string name="tab_text_2">Tokyo</string>
+    <string name="tab_text_3">California</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="humidity"><font fgcolor='#FFFFFFFF'>{wic-raindrop}</font></string>
+    <string name="humidity2"> 45%</string>
+
+    <string name="wind_speed"><font fgcolor='#FFFFFFFF'>{wic-strong-wind}</font></string>
+    <string name="wind_speed2"> 20 KMH</string>
+
+    <string name="wind_direction"><font fgcolor='#FFFFFFFF'>{wic-wind-direction}</font></string>
+    <string name="wind_direction2"> N</string>
+
+    <string name="visibility"><font fgcolor='#FFFFFFFF' size='16'>{faw-eye}</font></string>
+    <string name="visibility2"> 6 KM</string>
+
+    <string name="pressure"><font fgcolor='#FFFFFFFF'>{wic-barometer}</font></string>
+    <string name="pressure2"> 1011 hPa</string>
+
+</resources>
