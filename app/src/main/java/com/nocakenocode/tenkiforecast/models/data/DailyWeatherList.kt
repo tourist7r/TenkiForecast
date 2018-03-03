@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class DailyWeatherList(
         @SerializedName("dt")
-        val dt: String? = null,
+        val dt: Long? = null,
 
         @SerializedName("temp")
         val temp: Temp? = null,

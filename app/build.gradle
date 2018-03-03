@@ -40,4 +40,5 @@ dependencies {
     compile "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.jjoe64:graphview:4.2.1'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }
