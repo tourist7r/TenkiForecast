@@ -6,8 +6,10 @@ I will be continuing the development of this app shortly if I have enough time f
 
 Here are a couple screenshots of the App in action:
 
-![alt text](https://i.imgur.com/IVH8cCz.jpg)  ![alt text](https://i.imgur.com/SQbw7iN.jpg)
+![alt text](https://i.imgur.com/NpFQgYY.jpg) _ ![alt text](https://i.imgur.com/7HFZc5S.jpg)
   
 Several libraries have been used to make this, you can check them out over gradle.
+
+Code will be cleaned as I progress with the updates.
 
 Have fun.
