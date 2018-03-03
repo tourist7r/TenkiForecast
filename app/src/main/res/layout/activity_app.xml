@@ -46,15 +46,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="112dp"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/orbitron"
                 android:text="37°C"
                 android:textAllCaps="false"
                 android:textColor="@color/colorPrimary"
-                android:textSize="68sp"
+                android:textSize="58sp"
                 android:textStyle="bold"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/location_name"
                 tools:shadowColor="@color/colorAccent" />
 
             <TextView
@@ -64,7 +65,7 @@
                 android:layout_marginStart="8dp"
                 android:text="SKY IS CLEAR"
                 android:textColor="@color/light_grey"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/temperature" />
@@ -74,6 +75,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/orbitron"
                 android:text="26°/39° C"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
@@ -86,7 +89,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="44dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/humidity"
                 android:textColor="@color/light_grey"
                 android:textSize="24sp"
@@ -99,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="44dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/humidity2"
                 android:textColor="@color/light_grey"
                 android:textSize="24sp"
@@ -112,52 +115,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="68dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/wind_speed"
                 android:textColor="@color/light_grey"
                 android:textSize="24sp"
                 android:visibility="visible"
                 app:layout_constraintStart_toEndOf="@+id/humidity2"
-                app:layout_constraintTop_toBottomOf="@+id/description" />
+                app:layout_constraintTop_toBottomOf="@+id/low_high_temp" />
 
             <TextView
                 android:id="@+id/wind_speed2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="68dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/wind_speed2"
                 android:textColor="@color/light_grey"
                 android:textSize="24sp"
                 android:visibility="visible"
                 app:layout_constraintStart_toEndOf="@+id/wind_speed"
-                app:layout_constraintTop_toBottomOf="@+id/description" />
-
-            <TextView
-                android:id="@+id/wind_direction"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="100dp"
-                android:text="@string/wind_direction"
-                android:textColor="@color/light_grey"
-                android:textSize="24sp"
-                android:visibility="visible"
-                app:layout_constraintStart_toEndOf="@+id/wind_speed2"
-                app:layout_constraintTop_toBottomOf="@+id/temperature" />
-
-            <TextView
-                android:id="@+id/wind_direction2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="100dp"
-                android:text="@string/wind_direction2"
-                android:textColor="@color/light_grey"
-                android:textSize="24sp"
-                android:visibility="visible"
-                app:layout_constraintStart_toEndOf="@+id/wind_direction"
-                app:layout_constraintTop_toBottomOf="@+id/temperature" />
+                app:layout_constraintTop_toBottomOf="@+id/low_high_temp" />
 
             <TextView
                 android:id="@+id/pressure"
@@ -183,7 +160,33 @@
                 android:textSize="24sp"
                 android:visibility="visible"
                 app:layout_constraintStart_toEndOf="@+id/pressure"
-                app:layout_constraintTop_toBottomOf="@+id/humidity2" />
+                app:layout_constraintTop_toBottomOf="@+id/wind_speed" />
+
+            <TextView
+                android:id="@+id/wind_direction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/wind_direction"
+                android:textColor="@color/light_grey"
+                android:textSize="24sp"
+                android:visibility="visible"
+                app:layout_constraintStart_toEndOf="@+id/wind_speed2"
+                app:layout_constraintTop_toBottomOf="@+id/low_high_temp" />
+
+            <TextView
+                android:id="@+id/wind_direction2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/wind_direction2"
+                android:textColor="@color/light_grey"
+                android:textSize="24sp"
+                android:visibility="visible"
+                app:layout_constraintStart_toEndOf="@+id/wind_direction"
+                app:layout_constraintTop_toBottomOf="@+id/low_high_temp" />
 
             <TextView
                 android:id="@+id/weather_visibility"
@@ -209,7 +212,7 @@
                 android:textSize="24sp"
                 android:visibility="visible"
                 app:layout_constraintStart_toEndOf="@+id/weather_visibility"
-                app:layout_constraintTop_toBottomOf="@+id/wind_speed" />
+                app:layout_constraintTop_toBottomOf="@+id/wind_speed2" />
 
             <View
                 android:id="@+id/view"
@@ -281,13 +284,12 @@
                 android:id="@+id/location_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="14dp"
+                android:fontFamily="@font/audiowide"
                 android:text="Muscat"
                 android:textColor="@color/white"
                 android:textSize="24sp"
-                app:layout_constraintBottom_toTopOf="@+id/temperature"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/floatingActionButton4" />
 

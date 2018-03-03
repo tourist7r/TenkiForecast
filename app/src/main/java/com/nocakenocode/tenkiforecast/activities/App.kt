@@ -6,7 +6,7 @@ and display it on the users screen.
 
 Currently the locations are fixed on Muscat,London,Tokyo for experimentation purposes, this will be further updated later.
 
-Last Updated: 28th Feb 2018
+Last Updated: 3rd March 2018
 
 -Fahad Al Shidhani (NoCakeNoCode)
 
@@ -19,37 +19,32 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.google.gson.Gson
-import com.jjoe64.graphview.DefaultLabelFormatter
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.LineGraphSeries
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsContextWrapper
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons
 import com.nocakenocode.tenkiforecast.R
 import com.nocakenocode.tenkiforecast.models.CurrentWeather
 import com.nocakenocode.tenkiforecast.models.DailyWeather
+import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
 import kotlinx.android.synthetic.main.activity_app.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.uiThread
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
-import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
-import org.jetbrains.anko.doAsyncResult
 
 
 class App : AppCompatActivity() {
@@ -64,20 +59,20 @@ class App : AppCompatActivity() {
      */
 
     // API URL's for "Current" weather reports
-    val url1 = "http://api.openweathermap.org/data/2.5/weather?q=muscat&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
-    val url2 = "http://api.openweathermap.org/data/2.5/weather?q=london&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
-    val url3 = "http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
+    private val url1 = "http://api.openweathermap.org/data/2.5/weather?q=muscat&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
+    private val url2 = "http://api.openweathermap.org/data/2.5/weather?q=london&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
+    private val url3 = "http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
 
     // API URL's for Daily weather reports, the API Key here is borrowed from a different developer and may expire at any moment, this is only for testing purposes.
-    val url4 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=muscat&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
-    val url5 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=london&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
-    val url6 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=tokyo&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
+    private val url4 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=muscat&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
+    private val url5 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=london&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
+    private val url6 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=tokyo&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
 
     // Store Current Info for Each Location
-    private var location = Array<CurrentWeather>(3, { CurrentWeather() } )
+    private var location = Array(3, { CurrentWeather() } )
 
     // Store Daily Info to be displayed on the graph as shown on OWM website
-    private var location_daily = Array<DailyWeather>(3, { DailyWeather() } )
+    private var location_daily = Array(3, { DailyWeather() } )
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,13 +84,14 @@ class App : AppCompatActivity() {
         fab.setOnClickListener { view ->
 
             // Custom animation , Clockwise and Counter-Clockwise
-            val anim_cw = AnimationUtils.loadAnimation(applicationContext, R.anim.clockwise)
-            val anim_ccw = AnimationUtils.loadAnimation(applicationContext, R.anim.anticlockwise)
+            val animCW = AnimationUtils.loadAnimation(applicationContext, R.anim.clockwise)
+            val animCCW = AnimationUtils.loadAnimation(applicationContext, R.anim.anticlockwise)
 
-            fab.startAnimation(anim_cw)
+            fab.startAnimation(animCW)
 
             // Operation to fetch info from the API to prepare weather info data
             repopulateWeatherInfo()
+            repopulateDailyForecast()
 
             // Bar displayed at the bottom of the app
             val snackbar = Snackbar.make(view, "Refreshing...", Snackbar.LENGTH_LONG)
@@ -132,9 +128,6 @@ class App : AppCompatActivity() {
         fetchDailyForecast(1)
         fetchDailyForecast(2)
 
-        /*updateDailyForecast(0)
-        updateDailyForecast(1)
-        updateDailyForecast(2)*/
     }
 
     // Connect to API using ANKO library and Google GSON to retrieve and store data to be later used for daily forecasts
@@ -142,16 +135,16 @@ class App : AppCompatActivity() {
         doAsyncResult {
 
             // Proper URL selection
-            var owm_url = ""
+            var ownURL = ""
             if (location_position == 0)
-                owm_url = url4
+                ownURL = url4
             else if (location_position == 1)
-                owm_url = url5
+                ownURL = url5
             else
-                owm_url = url6
+                ownURL = url6
 
             // Connect to the API and read the entire generated response
-            val result = URL(owm_url).readText()
+            val result = URL(ownURL).readText()
             // Fetch Data from API
             val gson = Gson()
             val json = gson.fromJson(result, DailyWeather::class.java)
@@ -172,25 +165,23 @@ class App : AppCompatActivity() {
 
         chart.clear()
 
-        var sdf = SimpleDateFormat("EEE")
+        var sdf = SimpleDateFormat("D")
 
         for (i in 0..10 - 1) {
-
-            Log.d("wat1337" , "" + location_daily[location_position].infoDailyWeatherList?.get(i)?.dt)
 
             var unixSeconds: Long = ("" + location_daily[location_position].infoDailyWeatherList?.get(i)?.dt).toLong()
             // convert seconds to milliseconds
             val date = Date(unixSeconds * 1000L)
-            val temp = location_daily[location_position].infoDailyWeatherList?.get(i)?.temp?.day
+            val temperature = location_daily[location_position].infoDailyWeatherList?.get(i)?.temp?.day
+
+            var dayInYear = sdf.format(date)
             // Add data
-            entries += (BarEntry(i.toFloat() + 1,temp!!.toFloat()))
+            entries += (BarEntry(dayInYear.toFloat(),temperature!!.toFloat()))
 
-
-            //(location_daily[location_position].infoDailyWeatherList?.get(i)?.temp?.day).toDouble()
         }
 
 
-        var dataSet: BarDataSet =  BarDataSet(entries, "DAILY TEMPERATURE") // add entries to dataset
+        var dataSet =  BarDataSet(entries, "DAILY TEMPERATURE") // add entries to dataset
         dataSet.color = Color.parseColor("#00b1f2")
         dataSet.valueTextColor = Color.WHITE
         chart.legend.textColor = Color.WHITE
@@ -198,7 +189,7 @@ class App : AppCompatActivity() {
         chart.axisRight.textColor = Color.WHITE
         chart.xAxis.textColor = Color.WHITE
 
-        var xAxisFormatter: IAxisValueFormatter = CustomXAxisValueFormatter(chart)
+        var xAxisFormatter: IAxisValueFormatter = CustomXAxisValueFormatter()
 
         var xAxis:XAxis = chart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -208,19 +199,23 @@ class App : AppCompatActivity() {
         xAxis.valueFormatter = xAxisFormatter
         xAxis.labelRotationAngle = -45f
 
-        var data:BarData = BarData(dataSet)
+        var data = BarData(dataSet)
         data.barWidth = 0.9f // set custom bar width
         chart.data = data
         chart.setFitBars(true) // make the x-axis fit exactly all bars
         chart.description.isEnabled = false
         chart.invalidate() // refresh
+    }
+
+    private fun initChart(){
 
     }
 
-    private fun initGraph(){
-
+    private fun repopulateDailyForecast(){
+        updateDailyForecast(0)
+        updateDailyForecast(1)
+        updateDailyForecast(2)
     }
-
 
     // For "Current" Weather reports for each location, will be further optimized in the future.
     private fun repopulateWeatherInfo(){
@@ -251,9 +246,9 @@ class App : AppCompatActivity() {
             uiThread {
 
                 // Make changes in the UI
-                location_name.text = json.location_name
+                location_name.text = json.location_name?.toUpperCase()
 
-                temperature.text = "" + json.main?.temp + "°C"
+                temperature.text = "%.1f".format(json.main?.temp) + "°C"
                 description.text = "" + json.weather?.get(0)?.weather_description?.toUpperCase()
 
 
@@ -284,9 +279,9 @@ class App : AppCompatActivity() {
 
     private fun updateWeatherInfo(location_position:Int){
 
-        location_name.text = location[location_position].location_name
+        location_name.text = location[location_position].location_name?.toUpperCase()
 
-        temperature.text = "" + location[location_position].main?.temp + "°C"
+        temperature.text = "%.1f".format(location[location_position].main?.temp) + "°C"
         description.text = "" + location[location_position].weather?.get(0)?.weather_description?.toUpperCase()
 
         weatherIcon.setImageDrawable(IconicsDrawable(applicationContext)
@@ -309,7 +304,7 @@ class App : AppCompatActivity() {
 
         if(location[location_position].main?.pressure != null)
         pressure2.text = "" + location[location_position].main?.pressure + " hPa"
-        weather_visibility3.text = "" + if (location[location_position].visibility != null) ("" + location[location_position].visibility+ " M") else " N/A"
+        weather_visibility3.text = "" + if (location[location_position].visibility != null) ("" + location[location_position].visibility!!/1000.0+ " KM") else " N/A"
     }
 
 
