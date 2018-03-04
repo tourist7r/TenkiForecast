@@ -1,6 +1,6 @@
 package com.nocakenocode.tenkiforecast.renderers
 
-import com.github.mikephil.charting.charts.BarLineChartBase
+import android.annotation.SuppressLint
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import java.text.SimpleDateFormat
@@ -18,16 +18,17 @@ import java.util.*
 
 class CustomXAxisValueFormatter : IAxisValueFormatter {
 
+    @SuppressLint("SimpleDateFormat")
     override fun getFormattedValue(value: Float, axis: AxisBase): String {
 
         // used to format the date
-        var sdf = SimpleDateFormat("MMM d")
+        val sdf = SimpleDateFormat("MMM d")
         // get day of year
         val dayOfYear = value.toInt()
         // use current calendar to convert the given day into time
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_YEAR, dayOfYear)
-        var result:Date = calendar.time
+        val result:Date = calendar.time
 
         return "" + sdf.format(result) //format and return result as given pattern in sdf
     }

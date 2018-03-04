@@ -21,4 +21,11 @@
     <string name="pressure"><font fgcolor='#FFFFFFFF'>{wic-barometer}</font></string>
     <string name="pressure2"> 1011 hPa</string>
 
+    <string name="temperature_tv">%.1f°C</string>
+    <string name="low_high_temp_tv">%.1f°/%.1f°</string>
+    <string name="humidity_tv">%1$d%%</string>
+    <string name="wind_speed_tv">%.1f /KM</string>
+    <string name="wind_direction_tv">%1$d°</string>
+    <string name="pressure_tv">%.1f hPa</string>
+    <string name="visibility_tv">%1$d KM</string>
 </resources>
