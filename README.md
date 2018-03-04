@@ -6,7 +6,7 @@ I will be continuing the development of this app shortly if I have enough time f
 
 Here are a couple screenshots of the App in action:
 
-![alt text](https://i.imgur.com/NpFQgYY.jpg) _ ![alt text](https://i.imgur.com/7HFZc5S.jpg)
+![alt text](https://i.imgur.com/qnJTS1p.jpg)  ![alt text](https://i.imgur.com/m7P7QtI.jpg)
   
 Several libraries have been used to make this, you can check them out over gradle.
 
