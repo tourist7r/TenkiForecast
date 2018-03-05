@@ -1,8 +1,8 @@
-# TenkiForecast
+# Tenki Forecast
 
-This is An Android App written in Kotlin for educational purposes, it isn't yet complete but you're able to fetch data from OpenWeatherMap API without much issues.
+This is An Android App written in Kotlin for educational purposes, it isn't complete yet but you're able to fetch data from OpenWeatherMap API without much issues.
 
-I will be continuing the development of this app shortly if I have enough time for it.
+I will be continuing the development of this project shortly, hopefully if I have enough time for it.
 
 Here are a couple screenshots of the App in action:
 
@@ -10,6 +10,6 @@ Here are a couple screenshots of the App in action:
   
 Several libraries have been used to make this, you can check them out over gradle.
 
-Code will be cleaned as I progress with the updates.
+Code will be cleaned and refactored as I progress with the updates.
 
 Have fun.
