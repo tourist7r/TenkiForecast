@@ -21,6 +21,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.uiThread
 import java.net.URL
 import android.content.Intent
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_BACK
+
+
 
 
 
@@ -110,10 +114,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     finish()
                 }
             }
-
-
         }
+    }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            val data = Intent()
+            setResult(Activity.RESULT_CANCELED, data)
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

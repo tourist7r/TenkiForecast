@@ -10,7 +10,32 @@ Last Updated: 4th March 2018
 
 -Fahad Al Shidhani (NoCakeNoCode)
 
- */
+import shibe.doge.*
+░░░░░░░░░▄░░░░░░░░░░░░░░▄░░░░
+░░░░░░░░▌▒█░░░░░░░░░░░▄▀▒▌░░░
+░░░░░░░░▌▒▒█░░░░░░░░▄▀▒▒▒▐░░░
+░░░░░░░▐▄▀▒▒▀▀▀▀▄▄▄▀▒▒▒▒▒▐░░░
+░░░░░▄▄▀▒░▒▒▒▒▒▒▒▒▒█▒▒▄█▒▐░░░
+░░░▄▀▒▒▒░░░▒▒▒░░░▒▒▒▀██▀▒▌░░░
+░░▐▒▒▒▄▄▒▒▒▒░░░▒▒▒▒▒▒▒▀▄▒▒▌░░
+░░▌░░▌█▀▒▒▒▒▒▄▀█▄▒▒▒▒▒▒▒█▒▐░░
+░▐░░░▒▒▒▒▒▒▒▒▌██▀▒▒░░░▒▒▒▀▄▌░
+░▌░▒▄██▄▒▒▒▒▒▒▒▒▒░░░░░░▒▒▒▒▌░
+▀▒▀▐▄█▄█▌▄░▀▒▒░░░░░░░░░░▒▒▒▐░
+▐▒▒▐▀▐▀▒░▄▄▒▄▒▒▒▒▒▒░▒░▒░▒▒▒▒▌
+▐▒▒▒▀▀▄▄▒▒▒▄▒▒▒▒▒▒▒▒░▒░▒░▒▒▐░
+░▌▒▒▒▒▒▒▀▀▀▒▒▒▒▒▒░▒░▒░▒░▒▒▒▌░
+░▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▒▄▒▒▐░░
+░░▀▄▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▄▒▒▒▒▌░░
+░░░░▀▄▒▒▒▒▒▒▒▒▒▒▄▄▄▀▒▒▒▒▄▀░░░
+░░░░░░▀▄▄▄▄▄▄▀▀▀▒▒▒▒▒▄▄▀░░░░░
+░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▀▀░░░░░░░░
+wer am I !?
+wow
+much code violence
+such programming
+Omae wa mou.. Shindeiru.....NANIIII???!!
+*/
 
 package com.nocakenocode.tenkiforecast.activities
 
@@ -68,6 +93,8 @@ class App : AppCompatActivity() {
     // Store Daily Info to be displayed on the graph as shown on OWM website
     private var locationDaily = Array(3, { DailyWeather() })
 
+    // Current active location slot
+    private var currentActiveLocation = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,16 +108,19 @@ class App : AppCompatActivity() {
 
         // FAB's actions to update all 3 locations
         floatingActionButton4.onClick {
+            currentActiveLocation = 0
             updateCurrentWeatherInfo(0)
             updateDailyForecast(0)
         }
 
         floatingActionButton5.onClick {
+            currentActiveLocation = 1
             updateCurrentWeatherInfo(1)
             updateDailyForecast(1)
         }
 
         floatingActionButton6.onClick {
+            currentActiveLocation = 2
             updateCurrentWeatherInfo(2)
             updateDailyForecast(2)
         }
@@ -369,22 +399,13 @@ class App : AppCompatActivity() {
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        Log.d("rescode","" + resultCode)
-
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
-                val result = data.getIntExtra("slot" , 0)
-                //updateCurrentWeatherInfo(result)
-                //populateDailyForecast(result)
-
-                //initCurrentWeather()
-                //initDailyForecast()
-
                 fab.performClick() // refresh
             }
+
             if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-                toast("Canceled")
+
             }
         }
     }//onActivityResult
@@ -410,6 +431,14 @@ class App : AppCompatActivity() {
         val id = item.itemId
 
         if (id == R.id.action_settings) {
+            return true
+        }else if(id == R.id.action_edit_current){
+
+            when (currentActiveLocation) {
+                0 -> floatingActionButton4.performLongClick()
+                1 -> floatingActionButton5.performLongClick()
+                else -> floatingActionButton6.performLongClick()
+            }
             return true
         }
 
