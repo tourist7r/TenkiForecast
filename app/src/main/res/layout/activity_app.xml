@@ -53,7 +53,7 @@
                 android:fontFamily="@font/orbitron"
                 android:text="37°C"
                 android:textAllCaps="false"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/temperatureColor"
                 android:textSize="58sp"
                 android:textStyle="bold"
                 android:visibility="visible"

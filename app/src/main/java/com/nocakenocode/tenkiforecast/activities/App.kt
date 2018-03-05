@@ -15,11 +15,14 @@ Last Updated: 4th March 2018
 package com.nocakenocode.tenkiforecast.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -38,13 +41,11 @@ import com.nocakenocode.tenkiforecast.R
 import com.nocakenocode.tenkiforecast.models.CurrentWeather
 import com.nocakenocode.tenkiforecast.models.DailyWeather
 import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
+import com.nocakenocode.tenkiforecast.utils.URL_Helper
 import kotlinx.android.synthetic.main.activity_app.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.doAsyncResult
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -60,16 +61,6 @@ class App : AppCompatActivity() {
      * may be best to switch to a
      * [android.support.v4.app.FragmentStatePagerAdapter].
      */
-
-    // API URL's for "Current" weather reports - For Debugging Purposes, will be replaced with a URL helper on upcoming updates
-    private val url1 = "http://api.openweathermap.org/data/2.5/weather?q=muscat&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
-    private val url2 = "http://api.openweathermap.org/data/2.5/weather?q=london&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
-    private val url3 = "http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=e9e8cdc09be44201a887b25b5b1fcdcd&units=metric"
-
-    // API URL's for Daily weather reports, the API Key here is borrowed from a different developer and may expire at any moment, this is only for testing purposes.
-    private val url4 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=muscat&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
-    private val url5 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=london&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
-    private val url6 = "http://api.openweathermap.org/data/2.5/forecast/daily?q=tokyo&appid=bd5e378503939ddaee76f12ad7a97608&units=metric&cnt=10"
 
     // Store Current Info for Each Location
     private var location = Array(3, { CurrentWeather() })
@@ -104,17 +95,31 @@ class App : AppCompatActivity() {
             updateDailyForecast(2)
         }
 
+
+
         // change location on long click
         floatingActionButton4.onLongClick {
-            toast("Under Construction")
+            val intent = Intent(this@App , MapActivity::class.java)
+            intent.putExtra("slot", 0)
+            intent.putExtra("lon", location[0].coordData?.coord_lon)
+            intent.putExtra("lat", location[0].coordData?.coord_lat)
+            startActivityForResult(intent , 1)
         }
 
         floatingActionButton5.onLongClick {
-            toast("Under Construction")
+            val intent = Intent(this@App , MapActivity::class.java)
+            intent.putExtra("slot", 1)
+            intent.putExtra("lon", location[1].coordData?.coord_lon)
+            intent.putExtra("lat", location[1].coordData?.coord_lat)
+            startActivityForResult(intent , 1)
         }
 
         floatingActionButton6.onLongClick {
-            toast("Under Construction")
+            val intent = Intent(this@App , MapActivity::class.java)
+            intent.putExtra("slot", 2)
+            intent.putExtra("lon", location[2].coordData?.coord_lon)
+            intent.putExtra("lat", location[2].coordData?.coord_lat)
+            startActivityForResult(intent , 1)
         }
 
         // control the clicking action on the floating action button
@@ -150,12 +155,23 @@ class App : AppCompatActivity() {
 
     // Save data once to be reused for "Current" Weather reports
     private fun populateCurrentWeather(location_position: Int) {
+
+        // Shared preferences instance, used to get previously stored locations
+        val sharedPref = this@App?.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
+
         doAsync {
 
-            val owmURL: String = when (location_position) {
-                0 -> url1
-                1 -> url2
-                else -> url3
+            // Using URL helper class to construct the proper URL by feeding it the location id
+            val owmURL = when (location_position) {
+                0 -> URL_Helper.getCurrentWeatherURLByID(
+                        sharedPref.getString(getString(R.string.location_id_1) , getString(R.string.location_id_1))
+                )
+                1 -> URL_Helper.getCurrentWeatherURLByID(
+                        sharedPref.getString(getString(R.string.location_id_2) , getString(R.string.location_id_2))
+                )
+                else -> URL_Helper.getCurrentWeatherURLByID(sharedPref.getString(
+                        getString(R.string.location_id_3) , getString(R.string.location_id_3))
+                )
             }
 
             val result = URL(owmURL).readText()
@@ -261,17 +277,27 @@ class App : AppCompatActivity() {
 
     // Connect to API using ANKO library and Google GSON to retrieve and store data to be later used for daily forecasts
     private fun populateDailyForecast(location_position: Int) {
+
+        // Shared preferences instance, used to get previously stored locations
+        val sharedPref = this@App?.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
+
         doAsyncResult {
 
-            // Proper URL selection
-            val ownURL: String = when (location_position) {
-                0 -> url4
-                1 -> url5
-                else -> url6
+            // Using URL helper class to construct the proper URL by feeding it the location id
+            val owmURL = when (location_position) {
+                0 -> URL_Helper.getDailyForecastURLByID(
+                        sharedPref.getString(getString(R.string.location_id_1) , getString(R.string.location_id_1)) , 10
+                )
+                1 -> URL_Helper.getDailyForecastURLByID(
+                        sharedPref.getString(getString(R.string.location_id_2) , getString(R.string.location_id_2)) , 10
+                )
+                else -> URL_Helper.getDailyForecastURLByID(sharedPref.getString(
+                        getString(R.string.location_id_3) , getString(R.string.location_id_3)) , 10
+                )
             }
 
             // Connect to the API and read the entire generated response
-            val result = URL(ownURL).readText()
+            val result = URL(owmURL).readText()
             // Fetch Data from API
             val gson = Gson()
             val json = gson.fromJson(result, DailyWeather::class.java)
@@ -340,6 +366,28 @@ class App : AppCompatActivity() {
         chart.description.isEnabled = false
         chart.invalidate() // refresh
     }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        Log.d("rescode","" + resultCode)
+
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                val result = data.getIntExtra("slot" , 0)
+                //updateCurrentWeatherInfo(result)
+                //populateDailyForecast(result)
+
+                //initCurrentWeather()
+                //initDailyForecast()
+
+                fab.performClick() // refresh
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+                toast("Canceled")
+            }
+        }
+    }//onActivityResult
 
 
     // Inject into context to use Android Icons

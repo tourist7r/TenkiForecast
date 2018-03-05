@@ -28,4 +28,10 @@
     <string name="wind_direction_tv">%1$d°</string>
     <string name="pressure_tv">%.1f hPa</string>
     <string name="visibility_tv">%1$d KM</string>
+
+    <string name="location_id_1">287286</string> <!-- Muscat 287286 -->
+    <string name="location_id_2">2643743</string> <!-- London -->
+    <string name="location_id_3">1850147</string> <!-- Tokyo -->
+    <string name="title_activity_map">PINPOINT LOCATION</string>
+
 </resources>
