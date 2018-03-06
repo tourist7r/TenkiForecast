@@ -62,9 +62,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -100,15 +102,6 @@ import java.util.*
 
 class App : AppCompatActivity() {
 
-    /**
-     * The [android.support.v4.view.PagerAdapter] that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * [android.support.v4.app.FragmentStatePagerAdapter].
-     */
-
     // Store Current Info for Each Location
     private var location = Array(3, { CurrentWeather() })
 
@@ -118,9 +111,18 @@ class App : AppCompatActivity() {
     // Current active location slot
     private var currentActiveLocation = 0
 
+    // Floating Actions Buttons Array
+    private var fabArr = arrayOfNulls<FloatingActionButton>(3)
+
+    // Shared preferences instance, used to get previously stored locations
+    private var sharedPref: SharedPreferences? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app)
+
+        fabArr = arrayOf(floatingActionButton4, floatingActionButton5, floatingActionButton6)
+        sharedPref = this@App.getSharedPreferences("Wasabi", Context.MODE_PRIVATE)
 
         // Initialize Current Weather Data
         initCurrentWeather()
@@ -129,62 +131,14 @@ class App : AppCompatActivity() {
         initDailyForecast()
 
         // FAB's actions to update all 3 locations
-        floatingActionButton4.onClick {
-            currentActiveLocation = 0
-            updateCurrentWeatherInfo(0)
-            updateDailyForecast(0)
-        }
-
-        floatingActionButton5.onClick {
-            currentActiveLocation = 1
-            updateCurrentWeatherInfo(1)
-            updateDailyForecast(1)
-        }
-
-        floatingActionButton6.onClick {
-            currentActiveLocation = 2
-            updateCurrentWeatherInfo(2)
-            updateDailyForecast(2)
-        }
-
-
+        floatingActionButton4.onClick {onTapAction(0)}
+        floatingActionButton5.onClick {onTapAction(1)}
+        floatingActionButton6.onClick {onTapAction(2)}
 
         // change location on long click
-        floatingActionButton4.onLongClick {
-            if(isConnected(this@App)) {
-                floatingActionButton4.performClick()
-                val intent = Intent(this@App, MapActivity::class.java)
-                intent.putExtra("slot", 0)
-                intent.putExtra("lon", location[0].coordData?.coord_lon)
-                intent.putExtra("lat", location[0].coordData?.coord_lat)
-                startActivityForResult(intent, 1)
-            }else
-                longToast(R.string.no_connectivity)
-        }
-
-        floatingActionButton5.onLongClick {
-            if(isConnected(this@App)) {
-                floatingActionButton5.performClick()
-                val intent = Intent(this@App , MapActivity::class.java)
-                intent.putExtra("slot", 1)
-                intent.putExtra("lon", location[1].coordData?.coord_lon)
-                intent.putExtra("lat", location[1].coordData?.coord_lat)
-                startActivityForResult(intent , 1)
-            }else
-                longToast(R.string.no_connectivity)
-        }
-
-        floatingActionButton6.onLongClick {
-            if(isConnected(this@App)) {
-                floatingActionButton6.performClick()
-                val intent = Intent(this@App , MapActivity::class.java)
-                intent.putExtra("slot", 2)
-                intent.putExtra("lon", location[2].coordData?.coord_lon)
-                intent.putExtra("lat", location[2].coordData?.coord_lat)
-                startActivityForResult(intent , 1)
-            }else
-                longToast(R.string.no_connectivity)
-        }
+        floatingActionButton4.onLongClick {onLongAction(0)}
+        floatingActionButton5.onLongClick {onLongAction(1)}
+        floatingActionButton6.onLongClick {onLongAction(2)}
 
         // control the clicking action on the floating action button
         fab.setOnClickListener { view ->
@@ -209,6 +163,24 @@ class App : AppCompatActivity() {
         }
     }
 
+    private fun onTapAction(slot: Int){
+        currentActiveLocation = slot
+        updateCurrentWeatherInfo(slot)
+        updateDailyForecast(slot)
+    }
+
+    private fun onLongAction(slot: Int) {
+        if (isConnected(this@App)) {
+            fabArr[slot]?.performClick()
+            val intent = Intent(this@App, MapActivity::class.java)
+            intent.putExtra("slot", slot)
+            intent.putExtra("lon", location[slot].coordData?.coord_lon)
+            intent.putExtra("lat", location[slot].coordData?.coord_lat)
+            startActivityForResult(intent, 1)
+        } else
+            longToast(R.string.no_connectivity)
+    }
+
     // For "Current" Weather reports for each location, will be further optimized in the future.
     private fun initCurrentWeather() {
         populateCurrentWeather(0)
@@ -216,68 +188,43 @@ class App : AppCompatActivity() {
         populateCurrentWeather(2)
     }
 
-
     // Save data once to be reused for "Current" Weather reports
     private fun populateCurrentWeather(location_position: Int) {
-
-        // Shared preferences instance, used to get previously stored locations
-        val sharedPref = this@App.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
 
         doAsync {
 
             // Using URL helper class to construct the proper URL by feeding it the location id
             val owmURL = when (location_position) {
-                0 -> URL_Helper.getCurrentWeatherURLByID(
-                        sharedPref.getString(getString(R.string.location_id_1) , getString(R.string.location_id_1))
-                )
-                1 -> URL_Helper.getCurrentWeatherURLByID(
-                        sharedPref.getString(getString(R.string.location_id_2) , getString(R.string.location_id_2))
-                )
-                else -> URL_Helper.getCurrentWeatherURLByID(sharedPref.getString(
-                        getString(R.string.location_id_3) , getString(R.string.location_id_3))
-                )
+                0 -> URL_Helper.getCurrentWeatherURLByID(sharedPref!!.getString(getString(R.string.location_id_1), getString(R.string.location_id_1)))
+                1 -> URL_Helper.getCurrentWeatherURLByID(sharedPref!!.getString(getString(R.string.location_id_2), getString(R.string.location_id_2)))
+                else -> URL_Helper.getCurrentWeatherURLByID(sharedPref!!.getString(getString(R.string.location_id_3), getString(R.string.location_id_3)))
             }
 
             // determine if there's no internet connection to decide to use sharedPreferences
             // Fetch Data from API
             var result = ""
-            val gson = Gson()
-            if(!isConnected(this@App)){
 
-                if(location_position == 0){
-                    val json1 = sharedPref.getString("location1_CW_json", "")
-                    val obj1 = gson.fromJson(json1, CurrentWeather::class.java)
-                    location[location_position] = obj1
-                    result = gson.toJson(obj1)
-                }else if(location_position == 1){
-                    val json2 = sharedPref.getString("location2_CW_json", "")
-                    val obj2 = gson.fromJson(json2, CurrentWeather::class.java)
-                    location[location_position] = obj2
-                    result = gson.toJson(obj2)
-
-                }else if(location_position == 2){
-                    val json3 = sharedPref.getString("location3_CW_json", "")
-                    val obj3 = gson.fromJson(json3, CurrentWeather::class.java)
-                    location[location_position] = obj3
-                    result = gson.toJson(obj3)
+            if (!isConnected(this@App)) {
+                when (location_position) {
+                    0 -> result = setCurrentWeatherJSON(0 , "location1_CW_json")
+                    1 -> result = setCurrentWeatherJSON(1 , "location2_CW_json")
+                    2 -> result = setCurrentWeatherJSON(2 , "location3_CW_json")
                 }
-
-            }else{
+            } else {
                 result = URL(owmURL).readText()
-                val json = gson.fromJson(result, CurrentWeather::class.java)
+                val json = Gson().fromJson(result, CurrentWeather::class.java)
                 location[location_position] = json
             }
 
             // store json object using google gson
-            var prefsEditor = sharedPref.edit()
-            if(location_position == 0)
-                prefsEditor.putString("location1_CW_json", result)
-            else if(location_position == 1)
-                prefsEditor.putString("location2_CW_json", result)
-            else if(location_position == 2)
-                prefsEditor.putString("location3_CW_json", result)
+            val prefsEditor = sharedPref!!.edit()
+            when (location_position) {
+                0 -> prefsEditor.putString("location1_CW_json", result)
+                1 -> prefsEditor.putString("location2_CW_json", result)
+                2 -> prefsEditor.putString("location3_CW_json", result)
+            }
 
-            prefsEditor.commit()
+            prefsEditor.apply()
 
 
             uiThread {
@@ -286,6 +233,13 @@ class App : AppCompatActivity() {
         }
     }
 
+    private fun setCurrentWeatherJSON(location_position: Int,location_string:String):String{
+        val gson = Gson()
+        val json = sharedPref!!.getString(location_string, "")
+        val obj = gson.fromJson(json, CurrentWeather::class.java)
+        location[location_position] = obj
+        return gson.toJson(obj)
+    }
 
     /*
         This function will update the UI elements with current weather results fetched earlier and stored in the API
@@ -345,7 +299,6 @@ class App : AppCompatActivity() {
             resources.getString(R.string.visibility_tv, (location[location_position].visibility!! / 1000)) else "N/A"
     }
 
-
     // This helper function is used to determine which icon to use in respect to the weather description, will be placed in its own helper class file later
     private fun weatherIconHelper(description: String): WeatherIcons.Icon {
 
@@ -367,7 +320,6 @@ class App : AppCompatActivity() {
         return result
     }
 
-
     private fun initDailyForecast() {
         populateDailyForecast(0)
         populateDailyForecast(1)
@@ -377,21 +329,18 @@ class App : AppCompatActivity() {
     // Connect to API using ANKO library and Google GSON to retrieve and store data to be later used for daily forecasts
     private fun populateDailyForecast(location_position: Int) {
 
-        // Shared preferences instance, used to get previously stored locations
-        val sharedPref = this@App.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
-
         doAsyncResult {
 
             // Using URL helper class to construct the proper URL by feeding it the location id
             val owmURL = when (location_position) {
                 0 -> URL_Helper.getDailyForecastURLByID(
-                        sharedPref.getString(getString(R.string.location_id_1) , getString(R.string.location_id_1)) , 10
+                        sharedPref!!.getString(getString(R.string.location_id_1), getString(R.string.location_id_1)), 10
                 )
                 1 -> URL_Helper.getDailyForecastURLByID(
-                        sharedPref.getString(getString(R.string.location_id_2) , getString(R.string.location_id_2)) , 10
+                        sharedPref!!.getString(getString(R.string.location_id_2), getString(R.string.location_id_2)), 10
                 )
-                else -> URL_Helper.getDailyForecastURLByID(sharedPref.getString(
-                        getString(R.string.location_id_3) , getString(R.string.location_id_3)) , 10
+                else -> URL_Helper.getDailyForecastURLByID(sharedPref!!.getString(
+                        getString(R.string.location_id_3), getString(R.string.location_id_3)), 10
                 )
             }
 
@@ -399,54 +348,50 @@ class App : AppCompatActivity() {
             // debug version, will be optimized later
             // Fetch Data from API
             var result = ""
-            val gson = Gson()
-            if(!isConnected(this@App)){
 
-                if(location_position == 0){
-                    val json1 = sharedPref.getString("location1_DF_obj", "")
-                    val obj1 = gson.fromJson(json1, DailyWeather::class.java)
-                    locationDaily[location_position] = obj1
-                    result = gson.toJson(obj1)
-                }else if(location_position == 1){
-                    val json2 = sharedPref.getString("location2_DF_obj", "")
-                    val obj2 = gson.fromJson(json2, DailyWeather::class.java)
-                    locationDaily[location_position] = obj2
-                    result = gson.toJson(obj2)
+            if (!isConnected(this@App)) {
 
-                }else if(location_position == 2){
-                    val json3 = sharedPref.getString("location3_DF_obj", "")
-                    val obj3 = gson.fromJson(json3, DailyWeather::class.java)
-                    locationDaily[location_position] = obj3
-                    result = gson.toJson(obj3)
+                when (location_position) {
+                    0 -> result = setDailyForecastJSON(0 , "location1_DF_obj")
+                    1 -> result = setDailyForecastJSON(1 , "location2_DF_obj")
+                    2 -> result = setDailyForecastJSON(2 , "location3_DF_obj")
                 }
 
-            }else{
+            } else {
                 result = URL(owmURL).readText()
-                val json = gson.fromJson(result, DailyWeather::class.java)
+                val json = Gson().fromJson(result, DailyWeather::class.java)
                 locationDaily[location_position] = json
             }
 
             // store json object using google gson
-            var prefsEditor = sharedPref.edit()
-            if(location_position == 0)
-                prefsEditor.putString("location1_DF_obj", result)
-            else if(location_position == 1)
-                prefsEditor.putString("location2_DF_obj", result)
-            else if(location_position == 2)
-                prefsEditor.putString("location3_DF_obj", result)
+            val prefsEditor = sharedPref!!.edit()//fab.clearAnimation()
+            // end fab animation at the end of the last API call by reloading it with a finite animation
+            when (location_position) {
+                0 -> prefsEditor.putString("location1_DF_obj", result)
+                1 -> prefsEditor.putString("location2_DF_obj", result)
+                2 -> prefsEditor.putString("location3_DF_obj", result)
+            }
 
-            prefsEditor.commit()
+            prefsEditor.apply()
 
             uiThread {
                 updateDailyForecast(currentActiveLocation)
 
                 // end fab animation at the end of the last API call by reloading it with a finite animation
-                if(location_position == 2) {
+                if (location_position == 2) {
                     //fab.clearAnimation()
                     fab.animation = loadAnimation(applicationContext, R.anim.clockwise)
                 }
             }
         }
+    }
+
+    private fun setDailyForecastJSON(location_position: Int,location_string:String):String{
+        val gson = Gson()
+        val json = sharedPref!!.getString(location_string, "")
+        val obj = gson.fromJson(json, DailyWeather::class.java)
+        locationDaily[location_position] = obj
+        return gson.toJson(obj)
     }
 
     // function used to check for network connection
@@ -457,7 +402,6 @@ class App : AppCompatActivity() {
 
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting
     }
-
 
     @SuppressLint("SimpleDateFormat")
     private fun updateDailyForecast(location_position: Int) {
@@ -472,7 +416,7 @@ class App : AppCompatActivity() {
 
         for (i in 0 until 10) {
 
-            val unixSeconds: Long = if(locationDaily[location_position].infoDailyWeatherList?.get(i)?.dt != null)
+            val unixSeconds: Long = if (locationDaily[location_position].infoDailyWeatherList?.get(i)?.dt != null)
                 locationDaily[location_position].infoDailyWeatherList?.get(i)?.dt!! else -1L
             // convert seconds to milliseconds
             val date = Date(unixSeconds * 1000L)
@@ -523,13 +467,11 @@ class App : AppCompatActivity() {
         }
     }
 
-
     // Inject into context to use Android Icons
     // More from https://github.com/mikepenz/Android-Iconics
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(IconicsContextWrapper.wrap(newBase))
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -544,13 +486,14 @@ class App : AppCompatActivity() {
         val id = item.itemId
 
         if (id == R.id.action_settings) {
+
             return true
-        }else if(id == R.id.action_edit_current){
+        } else if (id == R.id.action_edit_current) {
 
             when (currentActiveLocation) {
                 0 -> floatingActionButton4.performLongClick()
                 1 -> floatingActionButton5.performLongClick()
-                else -> floatingActionButton6.performLongClick()
+                2 -> floatingActionButton6.performLongClick()
             }
             return true
         }
