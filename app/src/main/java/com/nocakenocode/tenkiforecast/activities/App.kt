@@ -1,15 +1,33 @@
 /*
-
-This is a weather forecast application made for educational purposes,
-The app is incomplete in some areas however it is functional and can fetch data from the API
-and display it on the users screen.
-
-Currently the locations are fixed on Muscat,London,Tokyo for experimentation purposes, this will be further updated later.
-
-Last Updated: 4th March 2018
-
--Fahad Al Shidhani (NoCakeNoCode)
-
+ * This is a weather forecast application made for educational purposes,
+ * The app has been developed in a compact manner to provide essential elements displayed in general weather forecast apps.
+ * Powering this App's data is OpenWeatherMap API -> https://openweathermap.org/
+ *
+ * Please be aware that you will need to replace the API keys which can be found in the URL_Helper class inside utils folder.
+ * Currently the first time default starting locations are fixed on Muscat,London,Tokyo for experimentation purposes,
+ * whatever location you select next via Google Maps API will be saved and reused until changed.
+ *
+ * Current App Features:
+ * - Select cities/location via Google Map API (Change via menu or long hold location button)
+ * - Shows current weather condition.
+ * - Shows daily forecast for the upcoming 10 days.
+ * - Refresh data, press the floating action button at the bottom.
+ * - Data persistence, latest API data fetched will be stored in shared preferences to be used as a backup when there's no network connection.
+ *
+ * This project utilizes the following libraries and resources:
+ * - Anko. (SDK, coroutines and commons)
+ * - Iconics-core.
+ * - Weather-Icons.
+ * - Font-Awesome.
+ * - Google gson for easy JSON parsing.
+ * - MPAndroidChart for charts and graphs.
+ * - Google Maps API.
+ * - OpenWeatherMap API.
+ *
+ * Created on 27th Feb 2018
+ *
+ * @Author -> Fahad Al Shidhani (NoCakeNoCode)
+ *
 import shibe.doge.*
 ░░░░░░░░░▄░░░░░░░░░░░░░░▄░░░░
 ░░░░░░░░▌▒█░░░░░░░░░░░▄▀▒▌░░░
@@ -34,7 +52,8 @@ wer am I !?
 wow
 much code violence
 such programming
-Omae wa mou.. Shindeiru.....NANIIII???!!
+Omae wa mou.. Shindeiru..................NANIIII???!!!!!o_O?
+
 */
 
 package com.nocakenocode.tenkiforecast.activities
@@ -44,10 +63,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -68,9 +87,12 @@ import com.nocakenocode.tenkiforecast.models.DailyWeather
 import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
 import com.nocakenocode.tenkiforecast.utils.URL_Helper
 import kotlinx.android.synthetic.main.activity_app.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.doAsyncResult
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
+import org.jetbrains.anko.uiThread
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -129,27 +151,39 @@ class App : AppCompatActivity() {
 
         // change location on long click
         floatingActionButton4.onLongClick {
-            val intent = Intent(this@App , MapActivity::class.java)
-            intent.putExtra("slot", 0)
-            intent.putExtra("lon", location[0].coordData?.coord_lon)
-            intent.putExtra("lat", location[0].coordData?.coord_lat)
-            startActivityForResult(intent , 1)
+            if(isConnected(this@App)) {
+                floatingActionButton4.performClick()
+                val intent = Intent(this@App, MapActivity::class.java)
+                intent.putExtra("slot", 0)
+                intent.putExtra("lon", location[0].coordData?.coord_lon)
+                intent.putExtra("lat", location[0].coordData?.coord_lat)
+                startActivityForResult(intent, 1)
+            }else
+                longToast(R.string.no_connectivity)
         }
 
         floatingActionButton5.onLongClick {
-            val intent = Intent(this@App , MapActivity::class.java)
-            intent.putExtra("slot", 1)
-            intent.putExtra("lon", location[1].coordData?.coord_lon)
-            intent.putExtra("lat", location[1].coordData?.coord_lat)
-            startActivityForResult(intent , 1)
+            if(isConnected(this@App)) {
+                floatingActionButton5.performClick()
+                val intent = Intent(this@App , MapActivity::class.java)
+                intent.putExtra("slot", 1)
+                intent.putExtra("lon", location[1].coordData?.coord_lon)
+                intent.putExtra("lat", location[1].coordData?.coord_lat)
+                startActivityForResult(intent , 1)
+            }else
+                longToast(R.string.no_connectivity)
         }
 
         floatingActionButton6.onLongClick {
-            val intent = Intent(this@App , MapActivity::class.java)
-            intent.putExtra("slot", 2)
-            intent.putExtra("lon", location[2].coordData?.coord_lon)
-            intent.putExtra("lat", location[2].coordData?.coord_lat)
-            startActivityForResult(intent , 1)
+            if(isConnected(this@App)) {
+                floatingActionButton6.performClick()
+                val intent = Intent(this@App , MapActivity::class.java)
+                intent.putExtra("slot", 2)
+                intent.putExtra("lon", location[2].coordData?.coord_lon)
+                intent.putExtra("lat", location[2].coordData?.coord_lat)
+                startActivityForResult(intent , 1)
+            }else
+                longToast(R.string.no_connectivity)
         }
 
         // control the clicking action on the floating action button
@@ -187,7 +221,7 @@ class App : AppCompatActivity() {
     private fun populateCurrentWeather(location_position: Int) {
 
         // Shared preferences instance, used to get previously stored locations
-        val sharedPref = this@App?.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
+        val sharedPref = this@App.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
 
         doAsync {
 
@@ -204,15 +238,50 @@ class App : AppCompatActivity() {
                 )
             }
 
-            val result = URL(owmURL).readText()
-
+            // determine if there's no internet connection to decide to use sharedPreferences
             // Fetch Data from API
+            var result = ""
             val gson = Gson()
-            val json = gson.fromJson(result, CurrentWeather::class.java)
-            location[location_position] = json
+            if(!isConnected(this@App)){
+
+                if(location_position == 0){
+                    val json1 = sharedPref.getString("location1_CW_json", "")
+                    val obj1 = gson.fromJson(json1, CurrentWeather::class.java)
+                    location[location_position] = obj1
+                    result = gson.toJson(obj1)
+                }else if(location_position == 1){
+                    val json2 = sharedPref.getString("location2_CW_json", "")
+                    val obj2 = gson.fromJson(json2, CurrentWeather::class.java)
+                    location[location_position] = obj2
+                    result = gson.toJson(obj2)
+
+                }else if(location_position == 2){
+                    val json3 = sharedPref.getString("location3_CW_json", "")
+                    val obj3 = gson.fromJson(json3, CurrentWeather::class.java)
+                    location[location_position] = obj3
+                    result = gson.toJson(obj3)
+                }
+
+            }else{
+                result = URL(owmURL).readText()
+                val json = gson.fromJson(result, CurrentWeather::class.java)
+                location[location_position] = json
+            }
+
+            // store json object using google gson
+            var prefsEditor = sharedPref.edit()
+            if(location_position == 0)
+                prefsEditor.putString("location1_CW_json", result)
+            else if(location_position == 1)
+                prefsEditor.putString("location2_CW_json", result)
+            else if(location_position == 2)
+                prefsEditor.putString("location3_CW_json", result)
+
+            prefsEditor.commit()
+
 
             uiThread {
-                updateCurrentWeatherInfo(0)
+                updateCurrentWeatherInfo(currentActiveLocation)
             }
         }
     }
@@ -277,7 +346,7 @@ class App : AppCompatActivity() {
     }
 
 
-    // This helper function is used to determine which icon to use in respect to the weather description
+    // This helper function is used to determine which icon to use in respect to the weather description, will be placed in its own helper class file later
     private fun weatherIconHelper(description: String): WeatherIcons.Icon {
 
         var result = WeatherIcons.Icon.wic_cloud
@@ -309,7 +378,7 @@ class App : AppCompatActivity() {
     private fun populateDailyForecast(location_position: Int) {
 
         // Shared preferences instance, used to get previously stored locations
-        val sharedPref = this@App?.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
+        val sharedPref = this@App.getSharedPreferences("Wasabi",Context.MODE_PRIVATE) ?: return
 
         doAsyncResult {
 
@@ -326,15 +395,50 @@ class App : AppCompatActivity() {
                 )
             }
 
-            // Connect to the API and read the entire generated response
-            val result = URL(owmURL).readText()
+            // determine if there's no internet connection to decide to use sharedPreferences
+            // debug version, will be optimized later
             // Fetch Data from API
+            var result = ""
             val gson = Gson()
-            val json = gson.fromJson(result, DailyWeather::class.java)
-            locationDaily[location_position] = json
-            // Data manipulation and UI changes
+            if(!isConnected(this@App)){
+
+                if(location_position == 0){
+                    val json1 = sharedPref.getString("location1_DF_obj", "")
+                    val obj1 = gson.fromJson(json1, DailyWeather::class.java)
+                    locationDaily[location_position] = obj1
+                    result = gson.toJson(obj1)
+                }else if(location_position == 1){
+                    val json2 = sharedPref.getString("location2_DF_obj", "")
+                    val obj2 = gson.fromJson(json2, DailyWeather::class.java)
+                    locationDaily[location_position] = obj2
+                    result = gson.toJson(obj2)
+
+                }else if(location_position == 2){
+                    val json3 = sharedPref.getString("location3_DF_obj", "")
+                    val obj3 = gson.fromJson(json3, DailyWeather::class.java)
+                    locationDaily[location_position] = obj3
+                    result = gson.toJson(obj3)
+                }
+
+            }else{
+                result = URL(owmURL).readText()
+                val json = gson.fromJson(result, DailyWeather::class.java)
+                locationDaily[location_position] = json
+            }
+
+            // store json object using google gson
+            var prefsEditor = sharedPref.edit()
+            if(location_position == 0)
+                prefsEditor.putString("location1_DF_obj", result)
+            else if(location_position == 1)
+                prefsEditor.putString("location2_DF_obj", result)
+            else if(location_position == 2)
+                prefsEditor.putString("location3_DF_obj", result)
+
+            prefsEditor.commit()
+
             uiThread {
-                updateDailyForecast(0)
+                updateDailyForecast(currentActiveLocation)
 
                 // end fab animation at the end of the last API call by reloading it with a finite animation
                 if(location_position == 2) {
@@ -343,6 +447,15 @@ class App : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // function used to check for network connection
+    private fun isConnected(context: Context): Boolean {
+        val cm = context
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting
     }
 
 
@@ -397,7 +510,7 @@ class App : AppCompatActivity() {
         chart.invalidate() // refresh
     }
 
-
+    // perform actions when MapActivity is over
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
@@ -408,7 +521,7 @@ class App : AppCompatActivity() {
 
             }
         }
-    }//onActivityResult
+    }
 
 
     // Inject into context to use Android Icons

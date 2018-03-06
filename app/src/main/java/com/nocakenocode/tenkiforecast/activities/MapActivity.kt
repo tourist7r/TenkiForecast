@@ -22,11 +22,6 @@ import org.jetbrains.anko.uiThread
 import java.net.URL
 import android.content.Intent
 import android.view.KeyEvent
-import android.view.KeyEvent.KEYCODE_BACK
-
-
-
-
 
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -87,7 +82,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Fetch Data from API
                 val gson = Gson()
                 val json = gson.fromJson(result, CurrentWeather::class.java)
-                var location = Array(3, { CurrentWeather() })
+                val location = Array(3, { CurrentWeather() })
                 val slot = intent.getIntExtra("slot" , 0) // fix it more later
 
                 location[slot] = json
@@ -96,7 +91,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     /* store location id in prefs and dismiss this activity */
 
                     // shared preferences instance
-                    val sharedPref = this@MapActivity?.getSharedPreferences("Wasabi",Context.MODE_PRIVATE)
+                    val sharedPref = this@MapActivity.getSharedPreferences("Wasabi",Context.MODE_PRIVATE)
 
                     with (sharedPref.edit()) {
 
