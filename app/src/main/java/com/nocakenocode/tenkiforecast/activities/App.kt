@@ -121,7 +121,7 @@ class App : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app)
 
-        fabArr = arrayOf(floatingActionButton4, floatingActionButton5, floatingActionButton6)
+        fabArr = arrayOf(fab1, fab2, fab3)
         sharedPref = this@App.getSharedPreferences("Wasabi", Context.MODE_PRIVATE)
 
         // Initialize Current Weather Data
@@ -131,14 +131,14 @@ class App : AppCompatActivity() {
         initDailyForecast()
 
         // FAB's actions to update all 3 locations
-        floatingActionButton4.onClick {onTapAction(0)}
-        floatingActionButton5.onClick {onTapAction(1)}
-        floatingActionButton6.onClick {onTapAction(2)}
+        fab1.onClick {onTapAction(0)}
+        fab2.onClick {onTapAction(1)}
+        fab3.onClick {onTapAction(2)}
 
         // change location on long click
-        floatingActionButton4.onLongClick {onLongAction(0)}
-        floatingActionButton5.onLongClick {onLongAction(1)}
-        floatingActionButton6.onLongClick {onLongAction(2)}
+        fab1.onLongClick {onLongAction(0)}
+        fab2.onLongClick {onLongAction(1)}
+        fab3.onLongClick {onLongAction(2)}
 
         // control the clicking action on the floating action button
         fab.setOnClickListener { view ->
@@ -491,9 +491,9 @@ class App : AppCompatActivity() {
         } else if (id == R.id.action_edit_current) {
 
             when (currentActiveLocation) {
-                0 -> floatingActionButton4.performLongClick()
-                1 -> floatingActionButton5.performLongClick()
-                2 -> floatingActionButton6.performLongClick()
+                0 -> fab1.performLongClick()
+                1 -> fab2.performLongClick()
+                2 -> fab3.performLongClick()
             }
             return true
         }
