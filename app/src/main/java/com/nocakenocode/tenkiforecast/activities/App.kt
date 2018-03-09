@@ -63,11 +63,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -164,7 +166,9 @@ class App : AppCompatActivity() {
     }
 
     private fun onTapAction(slot: Int){
+        setFabColorInactive()
         currentActiveLocation = slot
+        setFabColorActive()
         updateCurrentWeatherInfo(slot)
         updateDailyForecast(slot)
     }
@@ -179,6 +183,14 @@ class App : AppCompatActivity() {
             startActivityForResult(intent, 1)
         } else
             longToast(R.string.no_connectivity)
+    }
+
+    private fun setFabColorInactive(){
+        fabArr[currentActiveLocation]?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this,R.color.light_grey))
+    }
+
+    private fun setFabColorActive(){
+        fabArr[currentActiveLocation]?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this,R.color.colorPrimaryDark))
     }
 
     // For "Current" Weather reports for each location, will be further optimized in the future.

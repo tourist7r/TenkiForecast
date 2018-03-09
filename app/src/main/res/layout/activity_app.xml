@@ -244,8 +244,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.134"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/colorPrimaryDark" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab2"
@@ -255,14 +254,13 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
-                app:backgroundTint="@color/colorPrimaryDark"
+                app:backgroundTint="@color/light_grey"
                 app:ico_color="@color/white"
                 app:ico_icon="faw-map-marker-alt"
                 app:ico_size="48dp"
                 app:layout_constraintEnd_toStartOf="@+id/fab3"
                 app:layout_constraintStart_toEndOf="@+id/fab1"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/colorPrimaryDark" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab3"
@@ -272,15 +270,14 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
-                app:backgroundTint="@color/colorPrimaryDark"
+                app:backgroundTint="@color/light_grey"
                 app:ico_color="@color/white"
                 app:ico_icon="faw-map-marker-alt"
                 app:ico_size="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.875"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/colorPrimaryDark" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/location_name"
