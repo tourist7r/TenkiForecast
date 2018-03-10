@@ -1,10 +1,29 @@
 package com.nocakenocode.tenkiforecast.activities
 
+/*
+ * This class is responsible for managing and manipulating all the elements included
+ * in google map view, for instance you have autocomplete functionality which will allow you to
+ * search for cities by inputting their name in the search box, in addition you can tap the map to pinpoint
+ * your desired location.
+ *
+ * Once marked, you can click on the fab to save the location,
+ *
+ * This service uses Google Maps API v2 and Google Places API, current API key isn't restricted, please change it and restrict it for production environment.
+ *
+ * @Author -> Fahad (NoCakeNoCode)
+ * Created on 5th of March 2018
+ */
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.view.MenuItem
+import com.google.android.gms.common.api.Status
+import com.google.android.gms.location.places.Place
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment
+import com.google.android.gms.location.places.ui.PlaceSelectionListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -20,13 +39,13 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.uiThread
 import java.net.URL
-import android.content.Intent
-import android.view.KeyEvent
 
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private var placeAutoComplete: PlaceAutocompleteFragment = PlaceAutocompleteFragment()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +55,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.setHomeButtonEnabled(true)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        placeAutoComplete = fragmentManager.findFragmentById(R.id.place_autocomplete_fragment) as PlaceAutocompleteFragment
+
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-
     }
 
     /**
@@ -70,6 +88,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             mk.position = it
             //mMap.moveCamera(CameraUpdateFactory.newLatLng(it))
         }
+
+        // when user selects a city from the search box, the city will be marked in the map and the camera will move toward it
+        placeAutoComplete.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place) {
+
+                //Log.d("Maps", "Place selected: " + place.name)
+                mk.position = place.latLng
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.latLng))
+            }
+
+            override fun onError(status: Status) {
+                //Log.d("Maps", "An error occurred: " + status)
+            }
+        })
 
         floatingActionButtonGMap.onClick {
             // fetch data by coords

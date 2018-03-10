@@ -95,9 +95,12 @@ import com.nocakenocode.tenkiforecast.models.DailyWeather
 import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
 import com.nocakenocode.tenkiforecast.utils.URL_Helper
 import kotlinx.android.synthetic.main.activity_app.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.doAsyncResult
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
+import org.jetbrains.anko.uiThread
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -124,13 +127,13 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
     private var adapter: WeeklyForecastAdapter?  = null
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app)
 
         fabArr = arrayOf(fab1, fab2, fab3)
         sharedPref = this@App.getSharedPreferences("Wasabi", Context.MODE_PRIVATE)
+
 
         // Initialize Current Weather Data
         initCurrentWeather()
@@ -171,8 +174,6 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         }
 
     }
-
-
 
     private fun onTapAction(slot: Int){
         setFabColorInactive()
