@@ -28,13 +28,9 @@ class WeeklyForecastAdapter// data is passed into the constructor
 
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mClickListener: ItemClickListener? = null
-    private var dailyWeather = DailyWeather()
+    private var dailyWeather = locationDaily
     @SuppressLint("SimpleDateFormat")
     private val sdf = SimpleDateFormat("E")
-
-    init {
-        this.dailyWeather = locationDaily
-    }
 
     // inflates the row layout from xml when needed
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,9 +52,12 @@ class WeeklyForecastAdapter// data is passed into the constructor
         holder.weekly_day_weather_description.text = dailyWeather.infoDailyWeatherList?.get(position)?.weather?.get(0)?.weather_description?.toUpperCase()
     }
 
-    // total number of rows  <Warning - There may be a bug due to Async Task>
+    // total number of rows  <Warning - There used to be a crash due dailyWeather not being initialized somehow,
+    // I've placed a condition to fix it, tested over 10 times and its working properly now> I can only hope it won't crash anymore
     override fun getItemCount(): Int {
-        return dailyWeather.infoDailyWeatherList!!.size - 3 // api fetches 10, reduce it to 7
+        return if(dailyWeather.infoDailyWeatherList?.size != null)
+            dailyWeather.infoDailyWeatherList!!.size - 3 // api fetches 10, reduce it to 7
+        else 0
     }
 
     // stores and recycles views as they are scrolled off screen

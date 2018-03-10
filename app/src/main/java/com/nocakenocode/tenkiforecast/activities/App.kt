@@ -180,7 +180,6 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         setFabColorActive()
         updateCurrentWeatherInfo(slot)
         updateDailyForecast(slot)
-        updateWeeklyForecast(slot)
     }
 
     private fun onLongAction(slot: Int) {
@@ -397,7 +396,6 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
             uiThread {
                 updateDailyForecast(currentActiveLocation)
-                updateWeeklyForecast(currentActiveLocation)
                 // end fab animation at the end of the last API call by reloading it with a finite animation
                 if (location_position == 2) {
                     //fab.clearAnimation()
@@ -475,6 +473,9 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         chart.setFitBars(true) // make the x-axis fit exactly all bars
         chart.description.isEnabled = false
         chart.invalidate() // refresh
+
+        // commence updating weekly forecast
+        updateWeeklyForecast(location_position)
     }
 
     private fun updateWeeklyForecast(location_position: Int){
