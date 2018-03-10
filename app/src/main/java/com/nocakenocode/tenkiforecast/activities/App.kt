@@ -11,6 +11,7 @@
  * - Select cities/location via Google Map API (Change via menu or long hold location button)
  * - Shows current weather condition.
  * - Shows daily forecast for the upcoming 10 days.
+ * - Shows weekly forecast.
  * - Refresh data, press the floating action button at the bottom.
  * - Data persistence, latest API data fetched will be stored in shared preferences to be used as a backup when there's no network connection.
  *
@@ -71,11 +72,13 @@ import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils.loadAnimation
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -86,23 +89,21 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsContextWrapper
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons
 import com.nocakenocode.tenkiforecast.R
+import com.nocakenocode.tenkiforecast.adapters.WeeklyForecastAdapter
 import com.nocakenocode.tenkiforecast.models.CurrentWeather
 import com.nocakenocode.tenkiforecast.models.DailyWeather
 import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
 import com.nocakenocode.tenkiforecast.utils.URL_Helper
 import kotlinx.android.synthetic.main.activity_app.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.doAsyncResult
-import org.jetbrains.anko.longToast
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
-import org.jetbrains.anko.uiThread
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class App : AppCompatActivity() {
+class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
     // Store Current Info for Each Location
     private var location = Array(3, { CurrentWeather() })
@@ -118,6 +119,11 @@ class App : AppCompatActivity() {
 
     // Shared preferences instance, used to get previously stored locations
     private var sharedPref: SharedPreferences? = null
+
+    // 7 days Forecast View Adapter
+    private var adapter: WeeklyForecastAdapter?  = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,7 +169,10 @@ class App : AppCompatActivity() {
                 snackBar.dismiss()
             })
         }
+
     }
+
+
 
     private fun onTapAction(slot: Int){
         setFabColorInactive()
@@ -171,6 +180,7 @@ class App : AppCompatActivity() {
         setFabColorActive()
         updateCurrentWeatherInfo(slot)
         updateDailyForecast(slot)
+        updateWeeklyForecast(slot)
     }
 
     private fun onLongAction(slot: Int) {
@@ -281,7 +291,7 @@ class App : AppCompatActivity() {
             description.text = location[location_position].weather?.get(0)?.weather_description?.toUpperCase()
 
             weatherIcon.setImageDrawable(IconicsDrawable(applicationContext)
-                    .icon(weatherIconHelper("" + description.text))
+                    .icon(weatherIconHelper(location[location_position].weather?.get(0)?.weather_main?.toUpperCase()!!))
                     .color(Color.WHITE)
                     .sizeDp(78))
 
@@ -317,16 +327,15 @@ class App : AppCompatActivity() {
         var result = WeatherIcons.Icon.wic_cloud
 
         when (description) {
-            "CLEAR SKY" -> result = WeatherIcons.Icon.wic_day_sunny
-            "FEW CLOUDS" -> result = WeatherIcons.Icon.wic_cloud
-            "SCATTERED CLOUDS" -> result = WeatherIcons.Icon.wic_cloudy
-            "BROKEN CLOUDS" -> result = WeatherIcons.Icon.wic_cloudy
-            "SHOWER RAIN" -> result = WeatherIcons.Icon.wic_showers
+            "CLEAR" -> result = WeatherIcons.Icon.wic_day_sunny
+            "CLOUDS" -> result = WeatherIcons.Icon.wic_cloudy
+            "DRIZZLE" -> result = WeatherIcons.Icon.wic_showers
             "RAIN" -> result = WeatherIcons.Icon.wic_rain
             "THUNDERSTORM" -> result = WeatherIcons.Icon.wic_thunderstorm
             "SNOW" -> result = WeatherIcons.Icon.wic_snow
-            "SHOWER SNOW" -> result = WeatherIcons.Icon.wic_snow
-            "MIST" -> result = WeatherIcons.Icon.wic_fog
+            "ATMOSPHERE" -> result = WeatherIcons.Icon.wic_fog
+            "EXTREME" -> result = WeatherIcons.Icon.wic_tornado
+            "ADDITIONAL" -> result = WeatherIcons.Icon.wic_strong_wind
         }
 
         return result
@@ -388,7 +397,7 @@ class App : AppCompatActivity() {
 
             uiThread {
                 updateDailyForecast(currentActiveLocation)
-
+                updateWeeklyForecast(currentActiveLocation)
                 // end fab animation at the end of the last API call by reloading it with a finite animation
                 if (location_position == 2) {
                     //fab.clearAnimation()
@@ -444,6 +453,8 @@ class App : AppCompatActivity() {
         dataSet.color = Color.parseColor("#00b1f2")
         dataSet.valueTextColor = Color.WHITE
         chart.legend.textColor = Color.WHITE
+        chart.legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+        chart.legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
         chart.axisLeft.textColor = Color.WHITE
         chart.axisRight.textColor = Color.WHITE
         chart.xAxis.textColor = Color.WHITE
@@ -466,6 +477,16 @@ class App : AppCompatActivity() {
         chart.invalidate() // refresh
     }
 
+    private fun updateWeeklyForecast(location_position: Int){
+        // set up the RecyclerView
+        val recyclerView = rvWeekly
+        val horizontalLayoutManager =  LinearLayoutManager(this@App, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager = horizontalLayoutManager
+        adapter =  WeeklyForecastAdapter(this, locationDaily[location_position])
+        adapter!!.setClickListener(this)
+        recyclerView.adapter = adapter
+    }
+
     // perform actions when MapActivity is over
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         if (requestCode == 1) {
@@ -477,6 +498,11 @@ class App : AppCompatActivity() {
 
             }
         }
+    }
+
+    /* To be implemented later in case needed*/
+    override fun onItemClick(view: View, position: Int) {
+        //toast("""You clicked ${adapter!!.getItem(position)} on item position $position""")
     }
 
     // Inject into context to use Android Icons

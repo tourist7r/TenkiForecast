@@ -41,6 +41,7 @@ dependencies {
     compile "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
     compile "org.jetbrains.anko:anko-commons:$anko_version"
     compile 'com.google.code.gson:gson:2.8.2'
-    compile 'com.jjoe64:graphview:4.2.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    compile 'com.android.support:recyclerview-v7:26.+'
 }

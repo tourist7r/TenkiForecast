@@ -13,6 +13,7 @@ package com.nocakenocode.tenkiforecast.utils
 class URL_Helper {
 
     companion object{
+        // Free Account App Code
         val API_APP_CODE_NO1 = "e9e8cdc09be44201a887b25b5b1fcdcd"
 
         // Premium API provided by another GitHub developer, it may expire at any moment and render the app unusable, set your own app code please.

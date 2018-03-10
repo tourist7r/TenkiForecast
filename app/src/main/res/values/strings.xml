@@ -23,7 +23,7 @@
     <string name="pressure2"> 1011 hPa</string>
 
     <string name="temperature_tv">%.0f°C</string>
-    <string name="low_high_temp_tv">%.1f°/%.1f°</string>
+    <string name="low_high_temp_tv">%.0f°/%.0f°</string>
     <string name="humidity_tv">%1$d%%</string>
     <string name="wind_speed_tv">%.1f /KM</string>
     <string name="wind_direction_tv">%1$d°</string>
@@ -38,4 +38,7 @@
 
     <string name="title_activity_map">PINPOINT LOCATION</string>
 
+    <string name="weekly_day">SAT</string>
+    <string name="weekly_day_temperature">17° / 24°</string>
+    <string name="weekly_day_weather_description">FEW CLOUDS</string>
 </resources>

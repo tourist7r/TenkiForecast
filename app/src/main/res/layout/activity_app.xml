@@ -25,6 +25,8 @@
             android:layout_height="wrap_content"
             android:background="@color/background"
             android:backgroundTint="@color/background_light"
+            android:focusableInTouchMode="true"
+            android:focusedByDefault="true"
             android:visibility="visible"
             tools:context="com.nocakenocode.tenkiforecast.activities.App$PlaceholderFragment">
 
@@ -302,6 +304,17 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/view" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvWeekly"
+                android:layout_width="0dp"
+                android:layout_height="180dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/chart" />
 
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
