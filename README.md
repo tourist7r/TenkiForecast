@@ -4,13 +4,13 @@ This is an Android weather forecast application written in Kotlin made for educa
 
 App data source is powered by OpenWeatherMap API -> https://openweathermap.org/
 
-Here are a few screenshots of the App in action:
+Here are some screenshots of the App in action:
 
-![alt text](https://i.imgur.com/BnYOz9h.jpg) ![alt text](https://i.imgur.com/MWH6btQ.jpg)
+![alt text](https://i.imgur.com/i3uQiV7.png) ![alt text](https://i.imgur.com/dtRXbRw.png)
 
-![alt text](https://i.imgur.com/Ad6vvJj.jpg) ![alt text](https://i.imgur.com/loFFrJs.jpg)
+![alt text](https://i.imgur.com/iFSsLWT.png) ![alt text](https://i.imgur.com/aWQjusA.png)
 
-![alt text](https://i.imgur.com/H2fz1Wi.jpg)
+![alt text](https://i.imgur.com/O3znyVr.png) ![alt text](https://i.imgur.com/G3YeRs8.png)
 
  
 Please be aware that you will need to replace the API keys which can be found in the URL_Helper class inside utils folder as well the Google Map API key.
