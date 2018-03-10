@@ -6,15 +6,12 @@ App data source is powered by OpenWeatherMap API -> https://openweathermap.org/
 
 Here are a few screenshots of the App in action:
 
-![alt text](https://i.imgur.com/1Kt2Ycn.jpg)
+![alt text](https://i.imgur.com/BnYOz9h.jpg) ![alt text](https://i.imgur.com/MWH6btQ.jpg)
 
-![alt text](https://i.imgur.com/sMUfjSL.jpg)
+![alt text](https://i.imgur.com/Ad6vvJj.jpg) ![alt text](https://i.imgur.com/loFFrJs.jpg)
 
-![alt text](https://i.imgur.com/qOqiraD.jpg)
+![alt text](https://i.imgur.com/H2fz1Wi.jpg)
 
-![alt text](https://i.imgur.com/ad7Dqb5.jpg)
-
-![alt text](https://i.imgur.com/2jxDhrJ.jpg)
  
 Please be aware that you will need to replace the API keys which can be found in the URL_Helper class inside utils folder as well the Google Map API key.
 
