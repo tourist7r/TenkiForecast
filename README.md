@@ -6,11 +6,15 @@ App data source is powered by OpenWeatherMap API -> https://openweathermap.org/
 
 Here are a few screenshots of the App in action:
 
-![alt text](https://i.imgur.com/qnJTS1p.jpg)
+![alt text](https://i.imgur.com/1Kt2Ycn.jpg)
+
+![alt text](https://i.imgur.com/sMUfjSL.jpg)
+
+![alt text](https://i.imgur.com/qOqiraD.jpg)
+
+![alt text](https://i.imgur.com/ad7Dqb5.jpg)
 
 ![alt text](https://i.imgur.com/2jxDhrJ.jpg)
-
-![alt text](https://i.imgur.com/m7P7QtI.jpg)
  
 Please be aware that you will need to replace the API keys which can be found in the URL_Helper class inside utils folder as well the Google Map API key.
 
@@ -20,6 +24,7 @@ Current App Features:
 - Select cities/location via Google Map API (Change via menu or long hold location button)
 - Shows current weather condition.
 - Shows daily forecast for the upcoming 10 days.
+- Shows weekly forecast.
 - Refresh data, press the floating action button at the bottom.
 - Offline data - Latest API data fetched will be stored in shared preferences to be used as a backup when there's no network connection.
 
