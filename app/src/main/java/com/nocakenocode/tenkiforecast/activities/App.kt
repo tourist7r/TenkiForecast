@@ -94,6 +94,7 @@ import com.nocakenocode.tenkiforecast.models.CurrentWeather
 import com.nocakenocode.tenkiforecast.models.DailyWeather
 import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
 import com.nocakenocode.tenkiforecast.utils.URL_Helper
+import com.nocakenocode.tenkiforecast.utils.WeatherIconHelper
 import kotlinx.android.synthetic.main.activity_app.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
@@ -291,7 +292,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
             description.text = location[location_position].weather?.get(0)?.weather_description?.toUpperCase()
 
             weatherIcon.setImageDrawable(IconicsDrawable(applicationContext)
-                    .icon(weatherIconHelper(location[location_position].weather?.get(0)?.weather_main?.toUpperCase()!!))
+                    .icon(WeatherIconHelper.getNeutralWeatherIcon(location[location_position].weather?.get(0)?.weather_condition_id!!))
                     .color(Color.WHITE)
                     .sizeDp(78))
 
@@ -319,26 +320,6 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
         weather_visibility3.text = if (location[location_position].visibility != null)
             resources.getString(R.string.visibility_tv, (location[location_position].visibility!! / 1000)) else "N/A"
-    }
-
-    // This helper function is used to determine which icon to use in respect to the weather description, will be placed in its own helper class file later
-    private fun weatherIconHelper(description: String): WeatherIcons.Icon {
-
-        var result = WeatherIcons.Icon.wic_cloud
-
-        when (description) {
-            "CLEAR" -> result = WeatherIcons.Icon.wic_day_sunny
-            "CLOUDS" -> result = WeatherIcons.Icon.wic_cloudy
-            "DRIZZLE" -> result = WeatherIcons.Icon.wic_showers
-            "RAIN" -> result = WeatherIcons.Icon.wic_rain
-            "THUNDERSTORM" -> result = WeatherIcons.Icon.wic_thunderstorm
-            "SNOW" -> result = WeatherIcons.Icon.wic_snow
-            "ATMOSPHERE" -> result = WeatherIcons.Icon.wic_fog
-            "EXTREME" -> result = WeatherIcons.Icon.wic_tornado
-            "ADDITIONAL" -> result = WeatherIcons.Icon.wic_strong_wind
-        }
-
-        return result
     }
 
     private fun initDailyForecast() {

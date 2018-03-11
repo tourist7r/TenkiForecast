@@ -13,6 +13,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons
 import com.nocakenocode.tenkiforecast.R
 import com.nocakenocode.tenkiforecast.models.DailyWeather
+import com.nocakenocode.tenkiforecast.utils.WeatherIconHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,7 +47,7 @@ class WeeklyForecastAdapter// data is passed into the constructor
                 R.string.low_high_temp_tv, dailyWeather.infoDailyWeatherList?.get(position)?.temp?.min,
                 dailyWeather.infoDailyWeatherList?.get(position)?.temp?.max)
         holder.weekly_day_weather_icon.setImageDrawable(IconicsDrawable(context)
-                .icon(weatherIconHelper(dailyWeather.infoDailyWeatherList?.get(position)?.weather?.get(0)?.weather_main?.toUpperCase()!!))
+                .icon(WeatherIconHelper.getNeutralWeatherIcon(dailyWeather.infoDailyWeatherList?.get(position)?.weather?.get(0)?.weather_condition_id!!))
                 .color(Color.WHITE)
                 .sizeDp(42))
         holder.weekly_day_weather_description.text = dailyWeather.infoDailyWeatherList?.get(position)?.weather?.get(0)?.weather_description?.toUpperCase()
@@ -85,26 +86,6 @@ class WeeklyForecastAdapter// data is passed into the constructor
         // convert seconds to milliseconds
         val date = Date(unixSeconds * 1000L)
         return sdf.format(date).toUpperCase()
-    }
-
-    // This helper function is used to determine which icon to use in respect to the weather description, will be placed in its own helper class file later
-    private fun weatherIconHelper(description: String): WeatherIcons.Icon {
-
-        var result = WeatherIcons.Icon.wic_cloud
-
-        when (description) {
-            "CLEAR" -> result = WeatherIcons.Icon.wic_day_sunny
-            "CLOUDS" -> result = WeatherIcons.Icon.wic_cloudy
-            "DRIZZLE" -> result = WeatherIcons.Icon.wic_showers
-            "RAIN" -> result = WeatherIcons.Icon.wic_rain
-            "THUNDERSTORM" -> result = WeatherIcons.Icon.wic_thunderstorm
-            "SNOW" -> result = WeatherIcons.Icon.wic_snow
-            "ATMOSPHERE" -> result = WeatherIcons.Icon.wic_fog
-            "EXTREME" -> result = WeatherIcons.Icon.wic_tornado
-            "ADDITIONAL" -> result = WeatherIcons.Icon.wic_strong_wind
-        }
-
-        return result
     }
 
     // convenience method for getting data at click position

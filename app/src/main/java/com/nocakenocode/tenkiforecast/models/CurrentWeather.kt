@@ -42,7 +42,7 @@ data class CurrentWeather(
 
         // Time of data calculation in unix timestamp
         @SerializedName("dt")
-        private val dt: String? = null,
+        val dt: String? = null,
 
         @SerializedName("sys")
         val sys: Sys? = null,

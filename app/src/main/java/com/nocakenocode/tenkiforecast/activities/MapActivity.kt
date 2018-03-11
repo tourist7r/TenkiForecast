@@ -46,7 +46,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var placeAutoComplete: PlaceAutocompleteFragment = PlaceAutocompleteFragment()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
@@ -79,7 +78,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val locationCoords = LatLng(intent.getDoubleExtra("lat" , 55.2),
                 intent.getDoubleExtra("lon" , 2.2))
 
-        var mk = mMap.addMarker(MarkerOptions().position(locationCoords))
+        val mk = mMap.addMarker(MarkerOptions().position(locationCoords))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(locationCoords))
         mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
         mMap.uiSettings.isZoomControlsEnabled = true
