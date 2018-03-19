@@ -1,4 +1,4 @@
-package com.nocakenocode.tenkiforecast.models.data
+package com.nocakenocode.tenkiforecast.data.model.pojo
 
 import com.google.gson.annotations.SerializedName
 

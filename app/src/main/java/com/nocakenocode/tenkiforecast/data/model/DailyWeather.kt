@@ -1,7 +1,7 @@
-package com.nocakenocode.tenkiforecast.models
+package com.nocakenocode.tenkiforecast.data.model
 
 import com.google.gson.annotations.SerializedName
-import com.nocakenocode.tenkiforecast.models.data.DailyWeatherList
+import com.nocakenocode.tenkiforecast.data.model.pojo.DailyWeatherList
 
 
 /**

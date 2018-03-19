@@ -1,4 +1,4 @@
-package com.nocakenocode.tenkiforecast.renderers
+package com.nocakenocode.tenkiforecast.features.forecast
 
 import android.annotation.SuppressLint
 import com.github.mikephil.charting.components.AxisBase

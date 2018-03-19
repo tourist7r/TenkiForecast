@@ -57,7 +57,7 @@ Omae wa mou.. Shindeiru..................NANIIII???!!!!!o_O?
 
 */
 
-package com.nocakenocode.tenkiforecast.activities
+package com.nocakenocode.tenkiforecast.features.forecast
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -88,10 +88,9 @@ import com.google.gson.Gson
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsContextWrapper
 import com.nocakenocode.tenkiforecast.R
-import com.nocakenocode.tenkiforecast.adapters.WeeklyForecastAdapter
-import com.nocakenocode.tenkiforecast.models.CurrentWeather
-import com.nocakenocode.tenkiforecast.models.DailyWeather
-import com.nocakenocode.tenkiforecast.renderers.CustomXAxisValueFormatter
+import com.nocakenocode.tenkiforecast.features.location.MapActivity
+import com.nocakenocode.tenkiforecast.data.model.CurrentWeather
+import com.nocakenocode.tenkiforecast.data.model.DailyWeather
 import com.nocakenocode.tenkiforecast.utils.URL_Helper
 import com.nocakenocode.tenkiforecast.utils.WeatherIconHelper
 import kotlinx.android.synthetic.main.activity_app.*

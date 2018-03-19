@@ -1,4 +1,4 @@
-package com.nocakenocode.tenkiforecast.activities
+package com.nocakenocode.tenkiforecast.features.location
 
 /*
  * This class is responsible for managing and manipulating all the elements included
@@ -32,7 +32,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
 import com.nocakenocode.tenkiforecast.R
-import com.nocakenocode.tenkiforecast.models.CurrentWeather
+import com.nocakenocode.tenkiforecast.data.model.CurrentWeather
 import com.nocakenocode.tenkiforecast.utils.URL_Helper
 import kotlinx.android.synthetic.main.activity_map.*
 import org.jetbrains.anko.doAsync

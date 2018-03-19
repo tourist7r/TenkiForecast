@@ -1,7 +1,8 @@
-package com.nocakenocode.tenkiforecast.models
+package com.nocakenocode.tenkiforecast.data.model
 
 import com.google.gson.annotations.SerializedName
-import com.nocakenocode.tenkiforecast.models.data.*
+import com.nocakenocode.tenkiforecast.data.model.pojo.*
+import com.nocakenocode.tenkiforecast.domain.model.pojo.*
 
 /**
  * This class will be used as a structure to hold and represent the current weather data.

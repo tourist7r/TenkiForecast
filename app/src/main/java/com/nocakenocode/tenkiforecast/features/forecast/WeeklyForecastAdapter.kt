@@ -1,4 +1,4 @@
-package com.nocakenocode.tenkiforecast.adapters
+package com.nocakenocode.tenkiforecast.features.forecast
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,7 +12,7 @@ import android.widget.TextView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons
 import com.nocakenocode.tenkiforecast.R
-import com.nocakenocode.tenkiforecast.models.DailyWeather
+import com.nocakenocode.tenkiforecast.data.model.DailyWeather
 import com.nocakenocode.tenkiforecast.utils.WeatherIconHelper
 import java.text.SimpleDateFormat
 import java.util.*
