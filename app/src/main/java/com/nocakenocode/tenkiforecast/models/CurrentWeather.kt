@@ -2,7 +2,6 @@ package com.nocakenocode.tenkiforecast.models
 
 import com.google.gson.annotations.SerializedName
 import com.nocakenocode.tenkiforecast.models.data.*
-import java.util.*
 
 /**
  * This class will be used as a structure to hold and represent the current weather data.
@@ -18,61 +17,52 @@ import java.util.*
 data class CurrentWeather(
 
         @SerializedName("coord")
-        val coordData: Coord? = null,
+        val coordData: Coord,
         @SerializedName("weather")
-        val weather: List<Weather?>? = null,
+        val weather: List<Weather?>,
 
     // internal parameter from OWM server
         @SerializedName("base")
-        val base: String? = null,
+        val base: String,
 
         @SerializedName("main")
-        val main: Main? = null,
+        val main: Main,
 
 
         @SerializedName("visibility")
-        val visibility: Int? = null,
+        val visibility: Int,
 
 
         @SerializedName("wind")
-        val wind: Wind? = null,
+        val wind: Wind,
 
         @SerializedName("clouds")
-        val clouds: Clouds? = null,
+        val clouds: Clouds,
 
         // Time of data calculation in unix timestamp
         @SerializedName("dt")
-        val dt: String? = null,
+        val dt: String,
 
         @SerializedName("sys")
-        val sys: Sys? = null,
+        val sys: Sys,
 
         @SerializedName("id")
-        val location_id: String? = null,
+        val location_id: String,
         @SerializedName("name")
-        val location_name: String? = null,
+        val location_name: String,
 
         // internal parameter from OWM server
         @SerializedName("cod")
-        val cod: Int? = null
+        val cod: Int
 
 
 /*
     // For future updates
 
         @SerializedName("rain")
-    val rain: Rain? = null,
+    val rain: Rain,
         @SerializedName("snow")
-    val snow: Snow? = null,
+    val snow: Snow,
 */
 
-){
-    // Converting unix timestamp to valid date on return if available
-    var dateTime: Date? = null
-        get() {
-            if (dt != null) {
-                return Date(dt.toLong() * 1000L)
-            }
-            return null
-        }
-}
+)

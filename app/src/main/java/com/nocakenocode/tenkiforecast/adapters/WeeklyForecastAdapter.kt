@@ -25,7 +25,7 @@ import java.util.*
  * Created by Fahad on 2018-03-10.
  */
 class WeeklyForecastAdapter// data is passed into the constructor
-(private var context: Context, locationDaily:DailyWeather) : RecyclerView.Adapter<WeeklyForecastAdapter.ViewHolder>() {
+(private var context: Context, locationDaily: DailyWeather) : RecyclerView.Adapter<WeeklyForecastAdapter.ViewHolder>() {
 
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mClickListener: ItemClickListener? = null
@@ -42,33 +42,31 @@ class WeeklyForecastAdapter// data is passed into the constructor
     // binds the data to the view and textview in each row/column
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.day.text = getDayShortName(dailyWeather.infoDailyWeatherList?.get(position)?.dt.toString())
-        holder.weekly_day_temperature.text = context.getString(
-                R.string.low_high_temp_tv, dailyWeather.infoDailyWeatherList?.get(position)?.temp?.min,
-                dailyWeather.infoDailyWeatherList?.get(position)?.temp?.max)
-        holder.weekly_day_weather_icon.setImageDrawable(IconicsDrawable(context)
-                .icon(WeatherIconHelper.getNeutralWeatherIcon(dailyWeather.infoDailyWeatherList?.get(position)?.weather?.get(0)?.weather_condition_id!!))
-                .color(Color.WHITE)
-                .sizeDp(42))
-        holder.weekly_day_weather_description.text = dailyWeather.infoDailyWeatherList?.get(position)?.weather?.get(0)?.weather_description?.toUpperCase()
+        val data = dailyWeather.infoDailyWeatherList[position]
+        holder.bind(
+                getDayShortName(data.dt.toString()),
+                context.getString(
+                        R.string.low_high_temp_tv, data.temp.min,
+                        data.temp.max
+                ),
+                WeatherIconHelper.getNeutralWeatherIcon(data.weather.firstOrNull()?.weather_condition_id!!),
+                data.weather.firstOrNull()?.weather_description!!.toUpperCase()
+        )
     }
 
     // total number of rows  <Warning - There used to be a crash due dailyWeather not being initialized somehow,
     // I've placed a condition to fix it, tested over 10 times and its working properly now> I can only hope it won't crash anymore
-    override fun getItemCount(): Int {
-        return if(dailyWeather.infoDailyWeatherList?.size != null)
-            dailyWeather.infoDailyWeatherList!!.size - 3 // api fetches 10, reduce it to 7
-        else 0
-    }
+    override fun getItemCount() =
+            dailyWeather.infoDailyWeatherList.size - 3
+    // api fetches 10, reduce it to 7
 
     // stores and recycles views as they are scrolled off screen
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
-        var day: TextView = itemView.findViewById(R.id.day)
-        var weekly_day_temperature: TextView = itemView.findViewById(R.id.weekly_day_temperature)
-        var weekly_day_weather_icon: ImageView = itemView.findViewById(R.id.weekly_day_weather_icon)
-        var weekly_day_weather_description: TextView = itemView.findViewById(R.id.weekly_day_weather_description)
-
+        private var day: TextView = itemView.findViewById(R.id.day)
+        private var weeklyDayTemperature: TextView = itemView.findViewById(R.id.weekly_day_temperature)
+        private var weeklyDayWeatherIcon: ImageView = itemView.findViewById(R.id.weekly_day_weather_icon)
+        private var weeklyDayWeatherDescription: TextView = itemView.findViewById(R.id.weekly_day_weather_description)
 
         // for on click purposes
         /*
@@ -76,12 +74,25 @@ class WeeklyForecastAdapter// data is passed into the constructor
             itemView.setOnClickListener(this)
         }*/
 
+        // bind data method
+        fun bind(day: String, weekly_day_temperature: String, weekly_day_weather_icon: WeatherIcons.Icon, weekly_day_weather_description: String) {
+            this.day.text = day
+            this.weeklyDayTemperature.text = weekly_day_temperature
+            this.weeklyDayWeatherIcon.setImageDrawable(
+                    IconicsDrawable(context)
+                    .icon(weekly_day_weather_icon)
+                    .color(Color.WHITE)
+                    .sizeDp(42)
+            )
+            this.weeklyDayWeatherDescription.text = weekly_day_weather_description
+        }
+
         override fun onClick(view: View) {
             //if (mClickListener != null) mClickListener!!.onItemClick(view, adapterPosition)
         }
     }
 
-    private fun getDayShortName(timestamp:String):String{
+    private fun getDayShortName(timestamp: String): String {
         val unixSeconds: Long = timestamp.toLong()
         // convert seconds to milliseconds
         val date = Date(unixSeconds * 1000L)
@@ -89,9 +100,10 @@ class WeeklyForecastAdapter// data is passed into the constructor
     }
 
     // convenience method for getting data at click position
+    /*
     fun getItem(id: Int): String {
-        return dailyWeather.infoDailyWeatherList?.get(id)?.weather?.get(0)?.weather_main!!
-    }
+        return dailyWeather.infoDailyWeatherList?.get(id)?.weather?.firstOrNull()?.weather_main!!
+    }*/
 
 
     // allows clicks events to be caught

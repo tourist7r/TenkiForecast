@@ -7,30 +7,30 @@ import com.google.gson.annotations.SerializedName
  */
 data class DailyWeatherList(
         @SerializedName("dt")
-        val dt: Long? = null,
+        val dt: Long,
 
         @SerializedName("temp")
-        val temp: Temp? = null,
+        val temp: Temp,
 
         @SerializedName("pressure")
-        val pressure: Double? = null,
+        val pressure: Double,
 
         @SerializedName("humidity")
-        val humidity: Double? = null,
+        val humidity: Double,
 
         @SerializedName("weather")
-        val weather: List<Weather?>? = null,
+        val weather: List<Weather>,
 
         @SerializedName("speed")
-        val speed: Double? = null,
+        val speed: Double,
 
         @SerializedName("deg")
-        val deg: Double? = null,
+        val deg: Double,
 
         @SerializedName("clouds")
-        val clouds: Double? = null,
+        val clouds: Double,
 
         @SerializedName("rain")
-        val rain: Double? = null
+        val rain: Double
 
 )

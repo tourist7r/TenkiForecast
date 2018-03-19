@@ -113,7 +113,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Fetch Data from API
                 val gson = Gson()
                 val json = gson.fromJson(result, CurrentWeather::class.java)
-                val location = Array(3, { CurrentWeather() })
+                val location = arrayOfNulls<CurrentWeather>(3)
                 val slot = intent.getIntExtra("slot" , 0) // fix it more later
 
                 location[slot] = json
@@ -127,9 +127,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     with (sharedPref.edit()) {
 
                         when (slot) {
-                            0 -> putString(getString(R.string.location_id_1), location[slot].location_id)
-                            1 -> putString(getString(R.string.location_id_2), location[slot].location_id)
-                            else -> putString(getString(R.string.location_id_3), location[slot].location_id)
+                            0 -> putString(getString(R.string.location_id_1), location[slot]!!.location_id)
+                            1 -> putString(getString(R.string.location_id_2), location[slot]!!.location_id)
+                            else -> putString(getString(R.string.location_id_3), location[slot]!!.location_id)
                         }
 
                         commit()

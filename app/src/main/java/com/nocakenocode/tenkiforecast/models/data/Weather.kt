@@ -7,11 +7,11 @@ import com.google.gson.annotations.SerializedName
  */
 data class Weather (
         @SerializedName("id")
-        val weather_condition_id: Int? = null,
+        val weather_condition_id: Int,
         @SerializedName("main")
-        val weather_main: String? = null,
+        val weather_main: String,
         @SerializedName("description")
-        val weather_description: String? = null,
+        val weather_description: String,
         @SerializedName("icon")
-        val weather_icon: String? = null
+        val weather_icon: String
 )

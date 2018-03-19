@@ -7,5 +7,5 @@ import com.google.gson.annotations.SerializedName
  */
 class Clouds (
     @SerializedName("all")
-    val clouds_all: Int? = null
+    val clouds_all: Int
 )

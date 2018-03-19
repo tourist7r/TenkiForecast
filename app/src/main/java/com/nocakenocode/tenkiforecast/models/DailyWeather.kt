@@ -9,14 +9,14 @@ import com.nocakenocode.tenkiforecast.models.data.DailyWeatherList
  */
 data class DailyWeather(
         @SerializedName("cod")
-        val cod: String? = null,
+        val cod: String,
 
         @SerializedName("message")
-        val message: String? = null,
+        val message: String,
 
         @SerializedName("cnt")
-        val cnt: String? = null,
+        val cnt: String,
 
         @SerializedName("list")
-        val infoDailyWeatherList: List<DailyWeatherList?>? = null
+        val infoDailyWeatherList: List<DailyWeatherList>
 )

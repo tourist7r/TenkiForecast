@@ -8,19 +8,17 @@ import com.google.gson.annotations.SerializedName
 data class City(
 
         @SerializedName("id")
-        val id: String? = null,
+        val id: String,
 
         @SerializedName("name")
-        val name: String? = null,
+        val name: String,
 
         @SerializedName("coord")
-        val coordData: Coord? = null,
+        val coordData: Coord,
 
         @SerializedName("country")
-        val country: String? = null,
+        val country: String,
 
         @SerializedName("population")
-        val population: String? = null
-) {
-
-}
+        val population: String
+)

@@ -87,7 +87,6 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.google.gson.Gson
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsContextWrapper
-import com.mikepenz.weather_icons_typeface_library.WeatherIcons
 import com.nocakenocode.tenkiforecast.R
 import com.nocakenocode.tenkiforecast.adapters.WeeklyForecastAdapter
 import com.nocakenocode.tenkiforecast.models.CurrentWeather
@@ -107,13 +106,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
+class App : AppCompatActivity(), WeeklyForecastAdapter.ItemClickListener {
 
     // Store Current Info for Each Location
-    private var location = Array(3, { CurrentWeather() })
+    private var location = arrayOfNulls<CurrentWeather>(3)
 
     // Store Daily Info to be displayed on the graph as shown on OWM website
-    private var locationDaily = Array(3, { DailyWeather() })
+    private var locationDaily = arrayOfNulls<DailyWeather>(3)
 
     // Current active location slot
     private var currentActiveLocation = 0
@@ -122,10 +121,10 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
     private var fabArr = arrayOfNulls<FloatingActionButton>(3)
 
     // Shared preferences instance, used to get previously stored locations
-    private var sharedPref: SharedPreferences? = null
+    private lateinit var sharedPref: SharedPreferences
 
     // 7 days Forecast View Adapter
-    private var adapter: WeeklyForecastAdapter?  = null
+    private lateinit var adapter: WeeklyForecastAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,14 +142,14 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         initDailyForecast()
 
         // FAB's actions to update all 3 locations
-        fab1.onClick {onTapAction(0)}
-        fab2.onClick {onTapAction(1)}
-        fab3.onClick {onTapAction(2)}
+        fab1.onClick { onTapAction(0) }
+        fab2.onClick { onTapAction(1) }
+        fab3.onClick { onTapAction(2) }
 
         // change location on long click
-        fab1.onLongClick {onLongAction(0)}
-        fab2.onLongClick {onLongAction(1)}
-        fab3.onLongClick {onLongAction(2)}
+        fab1.onLongClick { onLongAction(0) }
+        fab2.onLongClick { onLongAction(1) }
+        fab3.onLongClick { onLongAction(2) }
 
         // control the clicking action on the floating action button
         fab.setOnClickListener { view ->
@@ -176,7 +175,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
     }
 
-    private fun onTapAction(slot: Int){
+    private fun onTapAction(slot: Int) {
         setFabColorInactive()
         currentActiveLocation = slot
         setFabColorActive()
@@ -189,19 +188,19 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
             fabArr[slot]?.performClick()
             val intent = Intent(this@App, MapActivity::class.java)
             intent.putExtra("slot", slot)
-            intent.putExtra("lon", location[slot].coordData?.coord_lon)
-            intent.putExtra("lat", location[slot].coordData?.coord_lat)
+            intent.putExtra("lon", location[slot]!!.coordData.coord_lon)
+            intent.putExtra("lat", location[slot]!!.coordData.coord_lat)
             startActivityForResult(intent, 1)
         } else
             longToast(R.string.no_connectivity)
     }
 
-    private fun setFabColorInactive(){
-        fabArr[currentActiveLocation]?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this,R.color.light_grey))
+    private fun setFabColorInactive() {
+        fabArr[currentActiveLocation]?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.light_grey))
     }
 
-    private fun setFabColorActive(){
-        fabArr[currentActiveLocation]?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this,R.color.colorPrimaryDark))
+    private fun setFabColorActive() {
+        fabArr[currentActiveLocation]?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryDark))
     }
 
     // For "Current" Weather reports for each location, will be further optimized in the future.
@@ -225,14 +224,10 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
             // determine if there's no internet connection to decide to use sharedPreferences
             // Fetch Data from API
-            var result = ""
+            val result: String
 
             if (!isConnected(this@App)) {
-                when (location_position) {
-                    0 -> result = setCurrentWeatherJSON(0 , "location1_CW_json")
-                    1 -> result = setCurrentWeatherJSON(1 , "location2_CW_json")
-                    2 -> result = setCurrentWeatherJSON(2 , "location3_CW_json")
-                }
+                result = setCurrentWeatherJSON(location_position, "location${location_position + 1}_CW_json")
             } else {
                 result = URL(owmURL).readText()
                 val json = Gson().fromJson(result, CurrentWeather::class.java)
@@ -241,11 +236,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
             // store json object using google gson
             val prefsEditor = sharedPref!!.edit()
-            when (location_position) {
-                0 -> prefsEditor.putString("location1_CW_json", result)
-                1 -> prefsEditor.putString("location2_CW_json", result)
-                2 -> prefsEditor.putString("location3_CW_json", result)
-            }
+            prefsEditor.putString("location${location_position + 1}_CW_json", result)
 
             prefsEditor.apply()
 
@@ -256,7 +247,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         }
     }
 
-    private fun setCurrentWeatherJSON(location_position: Int,location_string:String):String{
+    private fun setCurrentWeatherJSON(location_position: Int, location_string: String): String {
         val gson = Gson()
         val json = sharedPref!!.getString(location_string, "")
         val obj = gson.fromJson(json, CurrentWeather::class.java)
@@ -272,54 +263,63 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         The argument supplied should be between 0 and 2, the number supplied will denote the location.
      */
 
+    @SuppressLint("PrivateResource")
     private fun updateCurrentWeatherInfo(location_position: Int) {
 
         // Make changes in the UI , Always check for null
 
-        location_name.text = if (location[location_position].location_name != null)
-            location[location_position].location_name?.toUpperCase() else "N/A"
+        val data = location[location_position]
 
-        // left to right sliding animation
-        location_name.animation = loadAnimation(applicationContext, R.anim.left_to_right_slide)
+        if (data != null) {
+            location_name.text = data.location_name.toUpperCase()
 
-        temperature.text = if (location[location_position].main?.temp != null)
-            resources.getString(R.string.temperature_tv, location[location_position].main?.temp) else "N/A"
+            // left to right sliding animation
+            location_name.animation = loadAnimation(applicationContext, R.anim.left_to_right_slide)
 
-        // grow fade in animation
-        temperature.animation = loadAnimation(applicationContext, R.anim.abc_grow_fade_in_from_bottom)
+            temperature.text = resources.getString(R.string.temperature_tv, data.main.temp)
 
-        if (location[location_position].weather?.get(0)?.weather_description != null) {
-            description.text = location[location_position].weather?.get(0)?.weather_description?.toUpperCase()
+            // grow fade in animation
+            temperature.animation = loadAnimation(applicationContext, R.anim.abc_grow_fade_in_from_bottom)
+
+            description.text = data.weather.firstOrNull()!!.weather_description.toUpperCase()
 
             weatherIcon.setImageDrawable(IconicsDrawable(applicationContext)
-                    .icon(WeatherIconHelper.getNeutralWeatherIcon(location[location_position].weather?.get(0)?.weather_condition_id!!))
+                    .icon(WeatherIconHelper.getNeutralWeatherIcon(data.weather.firstOrNull()!!.weather_condition_id))
                     .color(Color.WHITE)
                     .sizeDp(78))
 
             // right to left slide animation
             weatherIcon.animation = loadAnimation(applicationContext, R.anim.right_to_left_slide)
 
-        } else description.text = "N/A"
+            low_high_temp.text =
+                    resources.getString(
+                            R.string.low_high_temp_tv,
+                            data.main.temp_min,
+                            data.main.temp_max
+                    )
 
-        low_high_temp.text = if (location[location_position].main?.temp_min != null && location[location_position].main?.temp_max != null)
-            resources.getString(R.string.low_high_temp_tv, location[location_position].main?.temp_min, location[location_position].main?.temp_max) else "N/A"
 
-        humidity2.text = if (location[location_position].main?.humidity != null)
-            resources.getString(R.string.humidity_tv, location[location_position].main?.humidity) else "N/A"
+            humidity2.text =
+                    resources.getString(
+                            R.string.humidity_tv,
+                            data.main.humidity
+                    )
 
-        wind_speed2.text = if (location[location_position].wind?.wind_speed != null)
-            resources.getString(R.string.wind_speed_tv, location[location_position].wind?.wind_speed) else "N/A"
+            wind_speed2.text =
+                    resources.getString(
+                            R.string.wind_speed_tv,
+                            data.wind.wind_speed
+                    )
 
-        if (location[location_position].wind?.wind_deg != null) {
-            wind_direction.rotation = location[location_position].wind?.wind_deg!!.toFloat()
-            wind_direction2.text = resources.getString(R.string.wind_direction_tv, location[location_position].wind!!.wind_deg!!.toInt())
-        } else wind_direction2.text = "N/A"
+            wind_direction.rotation = data.wind.wind_deg.toFloat()
+            wind_direction2.text = resources.getString(R.string.wind_direction_tv, data.wind.wind_deg.toInt())
 
-        pressure2.text = if (location[location_position].main?.pressure != null)
-            resources.getString(R.string.pressure_tv, location[location_position].main?.pressure) else "N/A"
+            //wind_direction2.text = "N/A"
 
-        weather_visibility3.text = if (location[location_position].visibility != null)
-            resources.getString(R.string.visibility_tv, (location[location_position].visibility!! / 1000)) else "N/A"
+            pressure2.text = resources.getString(R.string.pressure_tv, data.main.pressure)
+
+            weather_visibility3.text = resources.getString(R.string.visibility_tv, (data.visibility / 1000))
+        }
     }
 
     private fun initDailyForecast() {
@@ -349,16 +349,10 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
             // determine if there's no internet connection to decide to use sharedPreferences
             // debug version, will be optimized later
             // Fetch Data from API
-            var result = ""
+            val result: String
 
             if (!isConnected(this@App)) {
-
-                when (location_position) {
-                    0 -> result = setDailyForecastJSON(0 , "location1_DF_obj")
-                    1 -> result = setDailyForecastJSON(1 , "location2_DF_obj")
-                    2 -> result = setDailyForecastJSON(2 , "location3_DF_obj")
-                }
-
+                result = setDailyForecastJSON(location_position, "location${location_position + 1}_DF_obj")
             } else {
                 result = URL(owmURL).readText()
                 val json = Gson().fromJson(result, DailyWeather::class.java)
@@ -368,11 +362,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
             // store json object using google gson
             val prefsEditor = sharedPref!!.edit()//fab.clearAnimation()
             // end fab animation at the end of the last API call by reloading it with a finite animation
-            when (location_position) {
-                0 -> prefsEditor.putString("location1_DF_obj", result)
-                1 -> prefsEditor.putString("location2_DF_obj", result)
-                2 -> prefsEditor.putString("location3_DF_obj", result)
-            }
+            prefsEditor.putString("location${location_position + 1}_DF_obj", result)
 
             prefsEditor.apply()
 
@@ -387,7 +377,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         }
     }
 
-    private fun setDailyForecastJSON(location_position: Int,location_string:String):String{
+    private fun setDailyForecastJSON(location_position: Int, location_string: String): String {
         val gson = Gson()
         val json = sharedPref!!.getString(location_string, "")
         val obj = gson.fromJson(json, DailyWeather::class.java)
@@ -397,8 +387,7 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
 
     // function used to check for network connection
     private fun isConnected(context: Context): Boolean {
-        val cm = context
-                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
 
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting
@@ -410,62 +399,64 @@ class App : AppCompatActivity() , WeeklyForecastAdapter.ItemClickListener {
         // in this example, a LineChart is initialized from xml
         val chart = findViewById<View>(R.id.chart) as BarChart
         var entries: List<BarEntry> = ArrayList()
+        val data = locationDaily[location_position]
 
-        chart.clear()
+        if(data != null){
+            chart.clear()
 
-        val sdf = SimpleDateFormat("D")
+            val sdf = SimpleDateFormat("D")
 
-        for (i in 0 until 10) {
+            for (i in 0 until 10) {
 
-            val unixSeconds: Long = if (locationDaily[location_position].infoDailyWeatherList?.get(i)?.dt != null)
-                locationDaily[location_position].infoDailyWeatherList?.get(i)?.dt!! else -1L
-            // convert seconds to milliseconds
-            val date = Date(unixSeconds * 1000L)
-            val temperature = locationDaily[location_position].infoDailyWeatherList?.get(i)?.temp?.day ?: -1.0
+                val unixSeconds: Long = data.infoDailyWeatherList[i].dt
+                // convert seconds to milliseconds
+                val date = Date(unixSeconds * 1000L)
+                val temperature = data.infoDailyWeatherList[i].temp.day
+                val dayInYear = sdf.format(date)
+                // Add data
+                entries += (BarEntry(dayInYear.toFloat(), temperature.toFloat()))
 
-            val dayInYear = sdf.format(date)
-            // Add data
-            entries += (BarEntry(dayInYear.toFloat(), temperature.toFloat()))
+            }
 
+            val dataSet = BarDataSet(entries, "DAILY TEMPERATURE") // add entries to dataset
+            dataSet.color = Color.parseColor("#00b1f2")
+            dataSet.valueTextColor = Color.WHITE
+            chart.legend.textColor = Color.WHITE
+            chart.legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+            chart.legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+            chart.axisLeft.textColor = Color.WHITE
+            chart.axisRight.textColor = Color.WHITE
+            chart.xAxis.textColor = Color.WHITE
+
+            val xAxisFormatter: IAxisValueFormatter = CustomXAxisValueFormatter()
+
+            val xAxis: XAxis = chart.xAxis
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.setDrawGridLines(false)
+            xAxis.granularity = 1f // only intervals of 1 day
+            xAxis.labelCount = 10
+            xAxis.valueFormatter = xAxisFormatter
+            xAxis.labelRotationAngle = -45f
+
+            val barData = BarData(dataSet)
+            barData.barWidth = 0.9f // set custom bar width
+            chart.data = barData
+            chart.setFitBars(true) // make the x-axis fit exactly all bars
+            chart.description.isEnabled = false
+            chart.invalidate() // refresh
+
+            // commence updating weekly forecast
+            updateWeeklyForecast(location_position)
         }
 
-        val dataSet = BarDataSet(entries, "DAILY TEMPERATURE") // add entries to dataset
-        dataSet.color = Color.parseColor("#00b1f2")
-        dataSet.valueTextColor = Color.WHITE
-        chart.legend.textColor = Color.WHITE
-        chart.legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        chart.legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-        chart.axisLeft.textColor = Color.WHITE
-        chart.axisRight.textColor = Color.WHITE
-        chart.xAxis.textColor = Color.WHITE
-
-        val xAxisFormatter: IAxisValueFormatter = CustomXAxisValueFormatter()
-
-        val xAxis: XAxis = chart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.setDrawGridLines(false)
-        xAxis.granularity = 1f // only intervals of 1 day
-        xAxis.labelCount = 10
-        xAxis.valueFormatter = xAxisFormatter
-        xAxis.labelRotationAngle = -45f
-
-        val data = BarData(dataSet)
-        data.barWidth = 0.9f // set custom bar width
-        chart.data = data
-        chart.setFitBars(true) // make the x-axis fit exactly all bars
-        chart.description.isEnabled = false
-        chart.invalidate() // refresh
-
-        // commence updating weekly forecast
-        updateWeeklyForecast(location_position)
     }
 
-    private fun updateWeeklyForecast(location_position: Int){
+    private fun updateWeeklyForecast(location_position: Int) {
         // set up the RecyclerView
         val recyclerView = rvWeekly
-        val horizontalLayoutManager =  LinearLayoutManager(this@App, LinearLayoutManager.HORIZONTAL, false)
+        val horizontalLayoutManager = LinearLayoutManager(this@App, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.layoutManager = horizontalLayoutManager
-        adapter =  WeeklyForecastAdapter(this, locationDaily[location_position])
+        adapter = WeeklyForecastAdapter(this, locationDaily[location_position]!!)
         adapter!!.setClickListener(this)
         recyclerView.adapter = adapter
     }

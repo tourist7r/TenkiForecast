@@ -7,15 +7,15 @@ import com.google.gson.annotations.SerializedName
  */
 class Sys (
         @SerializedName("type")
-        val sys_type: Int? = null,
+        val sys_type: Int,
         @SerializedName("id")
-        val sys_id : String? = null,
+        val sys_id : String,
         @SerializedName("message")
-        val sys_message: String? = null,
+        val sys_message: String,
         @SerializedName("country")
-        val sys_country: String? = null,
+        val sys_country: String,
         @SerializedName("sunrise")
-        val sys_sunrise: String? = null,
+        val sys_sunrise: String,
         @SerializedName("sunset")
-        val sys_sunset: String? = null
+        val sys_sunset: String
 )
